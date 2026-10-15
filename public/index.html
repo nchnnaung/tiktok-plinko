@@ -7,7 +7,7 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #1e1b4b;
+      background: #110d2e;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       user-select: none;
@@ -15,7 +15,6 @@
       width: 100vw;
     }
 
-    /* Secret tap area at top of screen to toggle testing buttons */
     #secret-tap-zone {
       position: absolute; top: 0; left: 0; width: 100%; height: 50px; z-index: 100;
     }
@@ -26,15 +25,15 @@
 
     /* --- TOP PROGRESS & STATS HUD --- */
     #top-hud {
-      position: absolute; top: 16px; left: 0; width: 100%;
+      position: absolute; top: 14px; left: 0; width: 100%;
       display: flex; flex-direction: column; align-items: center;
-      gap: 8px; z-index: 50; pointer-events: none; padding: 0 16px;
+      gap: 6px; z-index: 50; pointer-events: none; padding: 0 16px;
     }
 
     .level-badge {
       background: linear-gradient(135deg, #f59e0b, #d97706);
       color: #fff;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 900;
       letter-spacing: 1px;
       padding: 4px 16px;
@@ -45,8 +44,8 @@
 
     /* Chonk Progress Bar */
     .bar-container {
-      width: 90%;
-      height: 24px;
+      width: 92%;
+      height: 22px;
       background: rgba(15, 23, 42, 0.85);
       border-radius: 14px;
       border: 2.5px solid #f472b6;
@@ -66,72 +65,189 @@
     }
     .bar-text {
       position: relative; z-index: 2;
-      font-size: 12px; font-weight: 900; color: #ffffff;
+      font-size: 11px; font-weight: 900; color: #ffffff;
       text-shadow: 0 2px 4px rgba(0,0,0,0.8);
       letter-spacing: 0.5px;
     }
 
+    /* Recent Feeder Pop Banner */
+    #recent-feed-toast {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1.5px solid #38bdf8;
+      border-radius: 20px;
+      padding: 3px 12px;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: all 0.3s ease;
+    }
+    #recent-feed-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     /* --- SIDEBAR GIFT MENUS --- */
     #rules-left {
-      position: absolute; top: 90px; left: 12px;
-      display: flex; flex-direction: column; gap: 8px; z-index: 50; pointer-events: none;
+      position: absolute; top: 90px; left: 10px;
+      display: flex; flex-direction: column; gap: 7px; z-index: 50; pointer-events: none;
     }
     #rules-right {
-      position: absolute; top: 90px; right: 12px;
-      display: flex; flex-direction: column; gap: 8px; z-index: 50; pointer-events: none;
+      position: absolute; top: 90px; right: 10px;
+      display: flex; flex-direction: column; gap: 7px; z-index: 50; pointer-events: none;
     }
 
     .gift-chip {
       background: rgba(15, 23, 42, 0.92);
       border-radius: 14px;
-      padding: 6px 10px;
+      padding: 5px 8px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       color: #ffffff;
       box-shadow: 0 4px 16px rgba(0,0,0,0.7);
       backdrop-filter: blur(6px);
-      border: 2px solid;
+      border: 1.5px solid;
     }
-    .chip-pink { border-color: #f472b6; box-shadow: 0 0 12px rgba(244, 114, 182, 0.35); }
-    .chip-gold { border-color: #f59e0b; box-shadow: 0 0 12px rgba(245, 158, 11, 0.35); }
+    .chip-pink { border-color: #f472b6; box-shadow: 0 0 10px rgba(244, 114, 182, 0.3); }
+    .chip-gold { border-color: #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
 
-    .chip-icon { font-size: 26px; line-height: 1; }
-    .chip-name { font-size: 11px; font-weight: 800; color: #cbd5e1; }
-    .chip-action { font-size: 12px; font-weight: 900; }
+    .chip-icon { font-size: 22px; line-height: 1; }
+    .chip-name { font-size: 10px; font-weight: 800; color: #cbd5e1; }
+    .chip-action { font-size: 11px; font-weight: 900; }
     .text-pink { color: #f472b6; }
     .text-gold { color: #f59e0b; }
 
-    /* Top Feeder Card */
-    #leaderboard-box {
-      position: absolute; bottom: 20px; right: 16px;
-      background: rgba(15, 23, 42, 0.92); border: 2px solid #f59e0b;
-      border-radius: 14px; padding: 8px 12px; color: white;
-      z-index: 50; pointer-events: none; box-shadow: 0 4px 18px rgba(0,0,0,0.8);
-      display: flex; align-items: center; gap: 8px;
+    /* --- BOTTOM: DEDICATED TOP FEEDERS LEADERBOARD --- */
+    #feeders-panel {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 94%;
+      max-width: 480px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 2px solid #f59e0b;
+      box-shadow: 0 0 24px rgba(245, 158, 11, 0.35);
+      border-radius: 20px;
+      padding: 10px 14px;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+      pointer-events: none;
     }
-    #top-feeder-img {
-      width: 32px; height: 32px; border-radius: 50%; border: 2px solid #f59e0b;
-      object-fit: cover;
-    }
-    .feeder-title { font-size: 9px; font-weight: 800; color: #f59e0b; letter-spacing: 0.5px; }
-    .feeder-name { font-size: 12px; font-weight: 900; }
 
-    /* Level Up Celebration Banner */
+    .feeders-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding-bottom: 4px;
+    }
+    .feeders-title {
+      font-size: 12px;
+      font-weight: 900;
+      color: #f59e0b;
+      letter-spacing: 0.5px;
+    }
+    .feeders-subtitle {
+      font-size: 10px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+
+    .feeders-list {
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+    }
+
+    /* Feeder Rank Cards */
+    .feeder-card {
+      flex: 1;
+      background: rgba(30, 41, 59, 0.8);
+      border-radius: 12px;
+      padding: 6px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      border: 1.5px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .rank-1 {
+      border-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.12);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+    }
+    .rank-2 {
+      border-color: #94a3b8;
+      background: rgba(148, 163, 184, 0.1);
+    }
+    .rank-3 {
+      border-color: #d97706;
+      background: rgba(217, 119, 6, 0.1);
+    }
+
+    .feeder-avatar-box {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      margin-bottom: 3px;
+    }
+    .feeder-pfp {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      object-fit: cover;
+      background: #0f172a;
+    }
+    .rank-crown {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .feeder-username {
+      font-size: 11px;
+      font-weight: 800;
+      color: #ffffff;
+      max-width: 95px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .feeder-treats {
+      font-size: 10px;
+      font-weight: 900;
+      color: #f472b6;
+      margin-top: 1px;
+    }
+
+    /* Celebration Banner */
     #celebrate-banner {
-      position: absolute; top: 46%; left: 50%; transform: translate(-50%, -50%) scale(0);
-      background: rgba(15, 23, 42, 0.98); padding: 28px 24px; border-radius: 28px;
+      position: absolute; top: 44%; left: 50%; transform: translate(-50%, -50%) scale(0);
+      background: rgba(15, 23, 42, 0.98); padding: 26px 22px; border-radius: 26px;
       text-align: center; color: white; z-index: 200;
       box-shadow: 0 0 60px rgba(245, 158, 11, 0.8);
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       border: 4px solid #f59e0b; width: 88%;
     }
-    #celebrate-title { font-size: 30px; font-weight: 900; color: #f59e0b; margin-bottom: 6px; }
-    #celebrate-sub { font-size: 16px; color: #cbd5e1; }
+    #celebrate-title { font-size: 28px; font-weight: 900; color: #f59e0b; margin-bottom: 6px; }
+    #celebrate-sub { font-size: 15px; color: #cbd5e1; }
 
     /* Testing controls */
     #test-panel {
-      position: absolute; bottom: 20px; left: 16px;
+      position: absolute; bottom: 120px; left: 16px;
       display: none; gap: 6px; background: rgba(0,0,0,0.9); padding: 8px 10px;
       border-radius: 12px; z-index: 150;
     }
@@ -152,6 +268,10 @@
     <div class="bar-container">
       <div class="bar-fill" id="food-bar" style="width: 15%;"></div>
       <div class="bar-text" id="food-bar-text">30 / 200 TREATS (15%)</div>
+    </div>
+    <div id="recent-feed-toast">
+      <span>💖</span>
+      <span id="recent-toast-text">Waiting for first treat...</span>
     </div>
   </div>
 
@@ -191,16 +311,46 @@
     </div>
   </div>
 
-  <!-- Top Feeder Badge -->
-  <div id="leaderboard-box">
-    <img id="top-feeder-img" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png">
-    <div>
-      <div class="feeder-title">🏆 TOP FEEDER</div>
-      <div class="feeder-name" id="top-feeder-name">Waiting for treats...</div>
+  <canvas id="game-canvas"></canvas>
+
+  <!-- --- BOTTOM: TOP 3 FEEDERS LEADERBOARD --- -->
+  <div id="feeders-panel">
+    <div class="feeders-header">
+      <span class="feeders-title">🏆 TOP CHONK FEEDERS</span>
+      <span class="feeders-subtitle">Gifts Level Up Cat!</span>
+    </div>
+    <div class="feeders-list">
+      <!-- Rank 1 -->
+      <div class="feeder-card rank-1">
+        <div class="feeder-avatar-box">
+          <img class="feeder-pfp" id="rank1-img" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png">
+          <span class="rank-crown">🥇</span>
+        </div>
+        <div class="feeder-username" id="rank1-name">---</div>
+        <div class="feeder-treats" id="rank1-treats">0 treats</div>
+      </div>
+
+      <!-- Rank 2 -->
+      <div class="feeder-card rank-2">
+        <div class="feeder-avatar-box">
+          <img class="feeder-pfp" id="rank2-img" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png">
+          <span class="rank-crown">🥈</span>
+        </div>
+        <div class="feeder-username" id="rank2-name">---</div>
+        <div class="feeder-treats" id="rank2-treats">0 treats</div>
+      </div>
+
+      <!-- Rank 3 -->
+      <div class="feeder-card rank-3">
+        <div class="feeder-avatar-box">
+          <img class="feeder-pfp" id="rank3-img" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png">
+          <span class="rank-crown">🥉</span>
+        </div>
+        <div class="feeder-username" id="rank3-name">---</div>
+        <div class="feeder-treats" id="rank3-treats">0 treats</div>
+      </div>
     </div>
   </div>
-
-  <canvas id="game-canvas"></canvas>
 
   <!-- Level Up Banner -->
   <div id="celebrate-banner">
@@ -226,40 +376,38 @@
     canvas.width = WIDTH;
     canvas.height = HEIGHT;
 
-    // Cat Position & Geometry
+    // Cat Position (Positioned slightly higher to leave room for the feeders podium)
     const CAT_X = WIDTH / 2;
-    const CAT_Y = HEIGHT * 0.65;
-    const BOWL_Y = CAT_Y + 180;
+    const CAT_Y = HEIGHT * 0.54;
+    const BOWL_Y = CAT_Y + 160;
 
     // Chonk Progression
     let currentTreats = 30;
     let maxTreats = 200;
     let chonkLevel = 1;
-    let catScale = 1.0; // Grows as cat eats!
+    let catScale = 1.0;
 
     // Animation Timers
     let animFrame = 0;
-    let mouthOpen = 0; // 0 (closed) to 1 (wide open nom nom)
+    let mouthOpen = 0;
     let chewTimer = 0;
     let blinkTimer = 0;
     let tailAngle = 0;
+    let toastTimeout = null;
 
     const foods = [];
     const particles = [];
-    const feederScores = {};
+    const feeders = {}; // Key: username, Value: { points, avatar }
 
     // --- GAME ENGINE LOOP ---
     function update() {
       animFrame++;
 
-      // Natural Tail Wag
       tailAngle = Math.sin(animFrame * 0.05) * 0.35;
 
-      // Natural Blinking
       if (blinkTimer > 0) blinkTimer--;
       else if (Math.random() < 0.015) blinkTimer = 12;
 
-      // Chewing Decay
       if (chewTimer > 0) {
         chewTimer--;
         mouthOpen = Math.abs(Math.sin(animFrame * 0.35));
@@ -267,30 +415,25 @@
         mouthOpen = 0;
       }
 
-      // Smooth chonk scale based on treat progress
       const targetScale = 1.0 + (currentTreats / maxTreats) * 0.45;
       catScale += (targetScale - catScale) * 0.05;
 
-      // Update Dropping Food Items
       for (let i = foods.length - 1; i >= 0; i--) {
         const f = foods[i];
-        f.vy += 0.45; // Gravity
+        f.vy += 0.45;
         f.x += f.vx;
         f.y += f.vy;
 
-        // Cat looks up eagerly and opens mouth when food gets close
-        if (f.y > CAT_Y - 260 && f.y < BOWL_Y) {
+        if (f.y > CAT_Y - 240 && f.y < BOWL_Y) {
           mouthOpen = Math.max(mouthOpen, 0.75);
         }
 
-        // Food lands in the cat's mouth / bowl!
         if (f.y >= BOWL_Y - 20) {
           eatFood(f);
           foods.splice(i, 1);
         }
       }
 
-      // Floating nom nom hearts & particles
       for (let i = particles.length - 1; i >= 0; i--) {
         const pt = particles[i];
         pt.x += pt.vx;
@@ -306,24 +449,24 @@
     function render() {
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-      // --- 1. COZY AMBIENT ROOM BACKGROUND ---
+      // Room Background
       const bg = ctx.createRadialGradient(CAT_X, CAT_Y - 100, 80, CAT_X, CAT_Y, 800);
       bg.addColorStop(0, '#2e1065');
-      bg.addColorStop(1, '#0f0b24');
+      bg.addColorStop(1, '#0c081e');
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-      // Warm rug under the cat
+      // Cozy Rug under cat
       ctx.save();
       ctx.shadowBlur = 30;
       ctx.shadowColor = 'rgba(244, 114, 182, 0.25)';
       ctx.fillStyle = '#4c1d95';
       ctx.beginPath();
-      ctx.ellipse(CAT_X, BOWL_Y + 40, 360 * catScale, 90, 0, 0, Math.PI * 2);
+      ctx.ellipse(CAT_X, BOWL_Y + 35, 340 * catScale, 85, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
 
-      // --- 2. PARTICLES & FLOATING HEARTS ---
+      // Floating particles
       for (const pt of particles) {
         ctx.save();
         ctx.globalAlpha = pt.life;
@@ -340,29 +483,24 @@
         ctx.restore();
       }
 
-      // --- 3. DRAW THE ANIMATED CHONKY CAT ---
+      // Draw Cat & Bowl
       drawAnimatedCat();
-
-      // --- 4. DRAW FOOD BOWL ---
       drawBowl();
 
-      // --- 5. DRAW FALLING FOOD WITH SENDER AVATARS ---
+      // Draw Dropping Foods with User Avatars
       for (const f of foods) {
         ctx.save();
         ctx.translate(f.x, f.y);
         ctx.rotate(f.rot);
 
-        // Food Shadow
         ctx.shadowBlur = 18;
         ctx.shadowColor = '#f472b6';
 
-        // Food Emoji / Icon Base
         ctx.font = '54px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(f.emoji, 0, 0);
 
-        // Stamp Sender Avatar on top corner of the food
         if (f.img && f.img.complete) {
           ctx.save();
           ctx.beginPath();
@@ -378,7 +516,6 @@
           ctx.stroke();
         }
 
-        // Sender Name tag
         ctx.font = 'bold 16px sans-serif';
         ctx.fillStyle = '#ffffff';
         ctx.shadowBlur = 6;
@@ -389,7 +526,7 @@
       }
     }
 
-    // --- PROCEDURAL CUTE CHONK CAT ---
+    // --- PROCEDURAL CAT DRAWING ---
     function drawAnimatedCat() {
       ctx.save();
       ctx.translate(CAT_X, CAT_Y);
@@ -399,7 +536,7 @@
       ctx.save();
       ctx.translate(-110, 80);
       ctx.rotate(tailAngle);
-      ctx.lineWidth = 32;
+      ctx.lineWidth = 30;
       ctx.strokeStyle = '#f97316';
       ctx.lineCap = 'round';
       ctx.beginPath();
@@ -408,149 +545,111 @@
       ctx.stroke();
       ctx.restore();
 
-      // Chonky Round Body
+      // Chonky Body
       ctx.save();
       ctx.shadowBlur = 25;
       ctx.shadowColor = 'rgba(249, 115, 22, 0.4)';
-      ctx.fillStyle = '#fb923c'; // Vibrant Orange Cat
+      ctx.fillStyle = '#fb923c';
       ctx.beginPath();
-      ctx.ellipse(0, 50, 160, 130, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 50, 155, 125, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
 
-      // White Belly Patch
+      // Belly Patch
       ctx.fillStyle = '#ffedd5';
       ctx.beginPath();
-      ctx.ellipse(0, 70, 105, 95, 0, 0, Math.PI * 2);
+      ctx.ellipse(0, 70, 100, 90, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Ears
       // Left Ear
       ctx.fillStyle = '#ea580c';
       ctx.beginPath();
-      ctx.moveTo(-110, -110);
-      ctx.lineTo(-60, -190);
-      ctx.lineTo(-20, -120);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.fillStyle = '#f472b6'; // Pink inside
+      ctx.moveTo(-105, -105); ctx.lineTo(-58, -180); ctx.lineTo(-20, -115);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#f472b6';
       ctx.beginPath();
-      ctx.moveTo(-95, -115);
-      ctx.lineTo(-60, -170);
-      ctx.lineTo(-35, -125);
-      ctx.closePath();
-      ctx.fill();
+      ctx.moveTo(-92, -110); ctx.lineTo(-58, -162); ctx.lineTo(-34, -120);
+      ctx.closePath(); ctx.fill();
 
       // Right Ear
       ctx.fillStyle = '#ea580c';
       ctx.beginPath();
-      ctx.moveTo(110, -110);
-      ctx.lineTo(60, -190);
-      ctx.lineTo(20, -120);
-      ctx.closePath();
-      ctx.fill();
-
+      ctx.moveTo(105, -105); ctx.lineTo(58, -180); ctx.lineTo(20, -115);
+      ctx.closePath(); ctx.fill();
       ctx.fillStyle = '#f472b6';
       ctx.beginPath();
-      ctx.moveTo(95, -115);
-      ctx.lineTo(60, -170);
-      ctx.lineTo(35, -125);
-      ctx.closePath();
-      ctx.fill();
+      ctx.moveTo(92, -110); ctx.lineTo(58, -162); ctx.lineTo(34, -120);
+      ctx.closePath(); ctx.fill();
 
-      // Round Head
+      // Head
       ctx.fillStyle = '#fb923c';
       ctx.beginPath();
-      ctx.arc(0, -65, 120, 0, Math.PI * 2);
+      ctx.arc(0, -65, 115, 0, Math.PI * 2);
       ctx.fill();
 
-      // Chubby Cheeks
+      // Cheeks
       ctx.fillStyle = '#fdba74';
       ctx.beginPath();
-      ctx.arc(-70, -40, 48, 0, Math.PI * 2);
-      ctx.arc(70, -40, 48, 0, Math.PI * 2);
+      ctx.arc(-68, -40, 46, 0, Math.PI * 2);
+      ctx.arc(68, -40, 46, 0, Math.PI * 2);
       ctx.fill();
 
       // Eyes
       if (blinkTimer > 0) {
-        // Happy closed eyes ^ ^
-        ctx.lineWidth = 6;
-        ctx.strokeStyle = '#1e1b4b';
-        ctx.beginPath();
-        ctx.arc(-45, -80, 20, Math.PI, 0);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(45, -80, 20, Math.PI, 0);
-        ctx.stroke();
+        ctx.lineWidth = 6; ctx.strokeStyle = '#1e1b4b';
+        ctx.beginPath(); ctx.arc(-42, -78, 19, Math.PI, 0); ctx.stroke();
+        ctx.beginPath(); ctx.arc(42, -78, 19, Math.PI, 0); ctx.stroke();
       } else {
-        // Big sparkling kawaii eyes
         ctx.fillStyle = '#1e1b4b';
         ctx.beginPath();
-        ctx.arc(-45, -80, 22, 0, Math.PI * 2);
-        ctx.arc(45, -80, 22, 0, Math.PI * 2);
+        ctx.arc(-42, -78, 20, 0, Math.PI * 2);
+        ctx.arc(42, -78, 20, 0, Math.PI * 2);
         ctx.fill();
-
-        // Eye highlights
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(-40, -86, 7, 0, Math.PI * 2);
-        ctx.arc(50, -86, 7, 0, Math.PI * 2);
+        ctx.arc(-38, -84, 6, 0, Math.PI * 2);
+        ctx.arc(46, -84, 6, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // Pink Nose
+      // Nose
       ctx.fillStyle = '#f43f5e';
       ctx.beginPath();
-      ctx.moveTo(-10, -45);
-      ctx.lineTo(10, -45);
-      ctx.lineTo(0, -35);
-      ctx.closePath();
-      ctx.fill();
+      ctx.moveTo(-10, -45); ctx.lineTo(10, -45); ctx.lineTo(0, -35);
+      ctx.closePath(); ctx.fill();
 
-      // Animated Mouth (Opens when food drops!)
+      // Mouth
       if (mouthOpen > 0.1) {
         ctx.fillStyle = '#be123c';
         ctx.beginPath();
-        ctx.ellipse(0, -22, 22 * mouthOpen, 28 * mouthOpen, 0, 0, Math.PI * 2);
+        ctx.ellipse(0, -22, 20 * mouthOpen, 26 * mouthOpen, 0, 0, Math.PI * 2);
         ctx.fill();
-
-        // Cute Little Tongue
         ctx.fillStyle = '#fb7185';
         ctx.beginPath();
-        ctx.arc(0, -14, 12 * mouthOpen, 0, Math.PI);
+        ctx.arc(0, -14, 11 * mouthOpen, 0, Math.PI);
         ctx.fill();
       } else {
-        // Closed w mouth :3
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = '#1e1b4b';
-        ctx.beginPath();
-        ctx.arc(-14, -32, 14, 0.1, Math.PI * 0.9);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(14, -32, 14, 0.1, Math.PI * 0.9);
-        ctx.stroke();
+        ctx.lineWidth = 4; ctx.strokeStyle = '#1e1b4b';
+        ctx.beginPath(); ctx.arc(-13, -32, 13, 0.1, Math.PI * 0.9); ctx.stroke();
+        ctx.beginPath(); ctx.arc(13, -32, 13, 0.1, Math.PI * 0.9); ctx.stroke();
       }
 
       // Whiskers
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = '#7c2d12';
-      // Left Whiskers
+      ctx.lineWidth = 3; ctx.strokeStyle = '#7c2d12';
       ctx.beginPath();
-      ctx.moveTo(-75, -45); ctx.lineTo(-135, -55);
-      ctx.moveTo(-75, -35); ctx.lineTo(-140, -35);
-      ctx.moveTo(-75, -25); ctx.lineTo(-130, -15);
-      // Right Whiskers
-      ctx.moveTo(75, -45); ctx.lineTo(135, -55);
-      ctx.moveTo(75, -35); ctx.lineTo(140, -35);
-      ctx.moveTo(75, -25); ctx.lineTo(130, -15);
+      ctx.moveTo(-70, -44); ctx.lineTo(-125, -54);
+      ctx.moveTo(-70, -34); ctx.lineTo(-130, -34);
+      ctx.moveTo(-70, -24); ctx.lineTo(-120, -14);
+      ctx.moveTo(70, -44); ctx.lineTo(125, -54);
+      ctx.moveTo(70, -34); ctx.lineTo(130, -34);
+      ctx.moveTo(70, -24); ctx.lineTo(120, -14);
       ctx.stroke();
 
-      // Front Paws
+      // Paws
       ctx.fillStyle = '#ffedd5';
       ctx.beginPath();
-      ctx.arc(-55, 140, 32, 0, Math.PI * 2);
-      ctx.arc(55, 140, 32, 0, Math.PI * 2);
+      ctx.arc(-52, 135, 30, 0, Math.PI * 2);
+      ctx.arc(52, 135, 30, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.restore();
@@ -558,57 +657,100 @@
 
     function drawBowl() {
       ctx.save();
-      ctx.shadowBlur = 18;
-      ctx.shadowColor = '#f472b6';
+      ctx.shadowBlur = 18; ctx.shadowColor = '#f472b6';
 
-      // Ceramic Bowl
       ctx.fillStyle = '#f43f5e';
       ctx.beginPath();
-      ctx.ellipse(CAT_X, BOWL_Y, 130, 48, 0, 0, Math.PI * 2);
+      ctx.ellipse(CAT_X, BOWL_Y, 120, 44, 0, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.fillStyle = '#e11d48';
       ctx.beginPath();
-      ctx.ellipse(CAT_X, BOWL_Y - 8, 120, 36, 0, 0, Math.PI * 2);
+      ctx.ellipse(CAT_X, BOWL_Y - 7, 110, 32, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Treats inside bowl
       ctx.fillStyle = '#fbbf24';
       ctx.beginPath();
-      ctx.ellipse(CAT_X, BOWL_Y - 10, 100, 26, 0, 0, Math.PI * 2);
+      ctx.ellipse(CAT_X, BOWL_Y - 9, 92, 24, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Bowl Text
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 16px sans-serif';
+      ctx.font = 'bold 15px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('🐾 CHONK', CAT_X, BOWL_Y + 14);
-
+      ctx.fillText('🐾 CHONK', CAT_X, BOWL_Y + 13);
       ctx.restore();
     }
 
-    // --- FOOD CONSUMPTION LOGIC ---
+    // --- FOOD INTAKE & FEEDERS LEADERBOARD ---
     function eatFood(food) {
-      chewTimer = 22; // Start chewing mouth animation
+      chewTimer = 22;
 
       currentTreats = Math.min(maxTreats, currentTreats + food.points);
       updateTreatBar();
 
-      // Update Top Feeder Leaderboard
-      feederScores[food.username] = (feederScores[food.username] || 0) + food.points;
-      updateLeaderboard(food.username, food.imgSrc);
+      // Update Feeders Data
+      if (!feeders[food.username]) {
+        feeders[food.username] = { points: 0, avatar: food.imgSrc };
+      }
+      feeders[food.username].points += food.points;
+      if (food.imgSrc) feeders[food.username].avatar = food.imgSrc;
 
-      // Spawn floating hearts & "NOM NOM"
+      // Update Leaderboard UI
+      updateFeedersDisplay();
+
+      // Trigger Feeder Toast
+      showFeedToast(food.username, food.points, food.emoji);
+
       spawnNomParticles(CAT_X, BOWL_Y - 40, food.points);
 
-      // Check Chonky Level Up
       if (currentTreats >= maxTreats) {
         triggerCelebration();
       }
     }
 
+    function showFeedToast(username, points, emoji) {
+      const toast = document.getElementById('recent-feed-toast');
+      const text = document.getElementById('recent-toast-text');
+      text.innerText = `${username} fed ${emoji} +${points} treats!`;
+      toast.classList.add('show');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function updateFeedersDisplay() {
+      // Sort feeders descending by total treats
+      const sorted = Object.entries(feeders)
+        .sort((a, b) => b[1].points - a[1].points)
+        .slice(0, 3);
+
+      const placeholder = 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
+
+      // Rank 1
+      if (sorted[0]) {
+        document.getElementById('rank1-name').innerText = sorted[0][0];
+        document.getElementById('rank1-treats').innerText = `${sorted[0][1].points} treats`;
+        if (sorted[0][1].avatar) document.getElementById('rank1-img').src = sorted[0][1].avatar;
+      }
+
+      // Rank 2
+      if (sorted[1]) {
+        document.getElementById('rank2-name').innerText = sorted[1][0];
+        document.getElementById('rank2-treats').innerText = `${sorted[1][1].points} treats`;
+        if (sorted[1][1].avatar) document.getElementById('rank2-img').src = sorted[1][1].avatar;
+      }
+
+      // Rank 3
+      if (sorted[2]) {
+        document.getElementById('rank3-name').innerText = sorted[2][0];
+        document.getElementById('rank3-treats').innerText = `${sorted[2][1].points} treats`;
+        if (sorted[2][1].avatar) document.getElementById('rank3-img').src = sorted[2][1].avatar;
+      }
+    }
+
     function spawnNomParticles(x, y, points) {
-      // Hearts
       const count = points >= 30 ? 15 : 6;
       for (let i = 0; i < count; i++) {
         particles.push({
@@ -623,7 +765,6 @@
         });
       }
 
-      // NOM NOM Text Popup
       particles.push({
         x: x,
         y: y - 30,
@@ -642,20 +783,6 @@
       document.getElementById('food-bar-text').innerText = `${currentTreats} / ${maxTreats} TREATS (${pct}%)`;
     }
 
-    function updateLeaderboard(username, avatarUrl) {
-      // Find top scorer
-      let topUser = username;
-      let topScore = 0;
-      for (const [u, pts] of Object.entries(feederScores)) {
-        if (pts > topScore) { topScore = pts; topUser = u; }
-      }
-
-      document.getElementById('top-feeder-name').innerText = `${topUser} (${topScore} pts)`;
-      if (avatarUrl) {
-        document.getElementById('top-feeder-img').src = avatarUrl;
-      }
-    }
-
     function triggerCelebration() {
       const banner = document.getElementById('celebrate-banner');
       chonkLevel++;
@@ -663,7 +790,6 @@
 
       banner.style.transform = 'translate(-50%, -50%) scale(1)';
 
-      // Golden particle fountain
       for (let i = 0; i < 50; i++) {
         particles.push({
           x: CAT_X,
@@ -680,7 +806,7 @@
       setTimeout(() => {
         banner.style.transform = 'translate(-50%, -50%) scale(0)';
         currentTreats = 20;
-        maxTreats = Math.round(maxTreats * 1.5); // Harder each level
+        maxTreats = Math.round(maxTreats * 1.5);
         updateTreatBar();
       }, 5000);
     }
@@ -694,7 +820,6 @@
       updateTreatBar();
     }
 
-    // --- FOOD SPAWN HANDLER ---
     function spawnFood(username, avatarUrl, coins) {
       let emoji = '🐟';
       let points = 1;
@@ -761,4 +886,3 @@
   </script>
 </body>
 </html>
-    
