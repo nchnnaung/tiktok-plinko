@@ -14,89 +14,87 @@
     }
     #canvas-box { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-    /* --- SIDEBAR CONTAINER POSITIONING --- */
+    /* --- SIDEBAR CONTAINERS (TUCKED INTO EMPTY SHOULDER SPACE) --- */
     .rules-sidebar {
       position: absolute;
-      top: 110px; /* Positioned in the shoulder gaps */
+      top: 60px; /* Starts high where the peg pyramid is narrowest */
       display: flex;
       flex-direction: column;
       gap: 16px;
       z-index: 50;
       pointer-events: none;
     }
-    #rules-left {
-      left: 14px;
-    }
-    #rules-right {
-      right: 14px;
-    }
+    #rules-left { left: 10px; }
+    #rules-right { right: 10px; }
 
-    /* --- BIGGER CARD STYLING --- */
+    /* --- 3X JUMBO CARD STYLING --- */
     .rule-card {
-      width: 115px;
-      background: rgba(15, 23, 42, 0.92);
-      border-radius: 14px;
-      padding: 10px 6px;
+      width: 142px;
+      background: rgba(11, 15, 30, 0.95);
+      border-radius: 20px;
+      padding: 12px 6px;
       text-align: center;
       color: #ffffff;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
     }
 
-    /* Left Side: Cyan / Blue Glow */
+    /* Left Side: Intense Cyan Glow */
     .card-blue {
-      border: 2px solid #38bdf8;
-      box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+      border: 3.5px solid #38bdf8;
+      box-shadow: 0 0 22px rgba(56, 189, 248, 0.55), inset 0 0 12px rgba(56, 189, 248, 0.2);
     }
     .badge-blue {
       background: #0284c7;
-      color: #fff;
+      color: #ffffff;
     }
     .ball-blue {
       color: #38bdf8;
-      text-shadow: 0 0 8px rgba(56, 189, 248, 0.7);
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.9);
     }
 
-    /* Right Side: Gold / Orange Glow */
+    /* Right Side: Intense Gold Glow */
     .card-gold {
-      border: 2px solid #f59e0b;
-      box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+      border: 3.5px solid #f59e0b;
+      box-shadow: 0 0 22px rgba(245, 158, 11, 0.55), inset 0 0 12px rgba(245, 158, 11, 0.2);
     }
     .badge-gold {
       background: #d97706;
-      color: #fff;
+      color: #ffffff;
     }
     .ball-gold {
       color: #fbbf24;
-      text-shadow: 0 0 8px rgba(245, 158, 11, 0.7);
+      text-shadow: 0 0 10px rgba(245, 158, 11, 0.9);
     }
 
-    /* Card Details */
+    /* Jumbo Typography & Icons */
     .tier-badge {
-      font-size: 10px;
+      font-size: 13px;
       font-weight: 900;
-      letter-spacing: 0.5px;
-      padding: 3px 6px;
-      border-radius: 6px;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 8px;
       display: inline-block;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
+      text-transform: uppercase;
     }
     .gift-icon {
-      font-size: 32px;
+      font-size: 52px; /* 3x Bigger Icon */
       line-height: 1.1;
-      margin-bottom: 2px;
+      margin: 4px 0 2px 0;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
     }
     .gift-name {
-      font-size: 12px;
-      font-weight: 700;
-      color: #cbd5e1;
+      font-size: 16px; /* Bigger Font */
+      font-weight: 800;
+      color: #f1f5f9;
     }
     .arrow {
-      font-size: 11px;
+      font-size: 14px;
       color: #64748b;
       margin: 2px 0;
     }
     .ball-count {
-      font-size: 16px;
+      font-size: 22px; /* 3x Bigger Outcome */
       font-weight: 900;
       letter-spacing: 0.5px;
     }
@@ -111,9 +109,9 @@
       border-radius: 5px; font-weight: bold; cursor: pointer; color: #000; font-size: 11px;
     }
 
-    /* Secret tap area at top of screen */
+    /* Secret tap area at top of screen to show/hide test buttons */
     #secret-tap-zone {
-      position: absolute; top: 0; left: 0; width: 100%; height: 70px; z-index: 60;
+      position: absolute; top: 0; left: 0; width: 100%; height: 60px; z-index: 60;
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
@@ -190,7 +188,7 @@
       Bodies.rectangle(width + 10, height / 2, 20, height, { isStatic: true })
     ]);
 
-    // Pegs
+    // Peg Matrix
     const rows = 11;
     const startY = 350;
     const spacingY = 85;
@@ -209,7 +207,7 @@
       }
     }
 
-    // Bottom Bins
+    // Bottom Multipliers
     const mults = [50, 10, 2, 0.5, 2, 10, 50];
     const binW = width / mults.length;
     const binY = 1600;
