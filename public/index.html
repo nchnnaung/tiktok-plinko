@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Ronaldo vs Messi - TikTok Live Tug of War</title>
+  <title>Ronaldo vs Messi - Arm Wrestling Live</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -21,13 +21,13 @@
 
     /* --- TOP HEADER & 3X BIGGER PLAYER CARDS --- */
     #top-bar {
-      position: absolute; top: 18px; left: 0; width: 100%;
+      position: absolute; top: 16px; left: 0; width: 100%;
       display: flex; justify-content: space-between; align-items: flex-start;
       padding: 0 12px; z-index: 50; pointer-events: none;
     }
 
     .player-card {
-      width: 155px; /* 3x expanded card footprint */
+      width: 155px;
       padding: 14px 8px;
       border-radius: 22px;
       text-align: center;
@@ -36,7 +36,7 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
     }
 
-    /* Left Side: Ronaldo (CR7 / Red & Gold) */
+    /* Left: Ronaldo (CR7 / Red) */
     .ronaldo-card {
       background: rgba(220, 38, 38, 0.22);
       border: 3.5px solid #ef4444;
@@ -52,7 +52,7 @@
       color: #f87171; text-shadow: 0 0 12px rgba(239, 68, 68, 0.9);
     }
 
-    /* Right Side: Messi (LM10 / Argentina Cyan & Gold) */
+    /* Right: Messi (LM10 / Sky Blue) */
     .messi-card {
       background: rgba(56, 189, 248, 0.22);
       border: 3.5px solid #38bdf8;
@@ -97,7 +97,7 @@
       padding-top: 4px;
     }
 
-    /* Center Timer */
+    /* Center Match Timer */
     #timer-box {
       background: rgba(15, 23, 42, 0.92);
       border: 2px solid #64748b;
@@ -112,36 +112,36 @@
 
     /* --- TENSION PROGRESS BAR --- */
     #meter-container {
-      position: absolute; top: 245px; left: 4%; width: 92%; height: 28px;
-      background: #111827; border-radius: 14px; overflow: hidden;
+      position: absolute; top: 245px; left: 4%; width: 92%; height: 26px;
+      background: #111827; border-radius: 13px; overflow: hidden;
       display: flex; border: 2.5px solid #334155; z-index: 40;
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
     }
     #ronaldo-meter {
       width: 50%; height: 100%;
       background: linear-gradient(90deg, #b91c1c, #ef4444);
-      transition: width 0.15s ease;
+      transition: width 0.1s ease-out;
     }
     #messi-meter {
       width: 50%; height: 100%;
       background: linear-gradient(90deg, #0284c7, #38bdf8);
-      transition: width 0.15s ease;
+      transition: width 0.1s ease-out;
     }
 
-    /* Canvas */
+    /* Main Game Canvas */
     #game-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
     /* Victory Banner */
     #winner-banner {
-      position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%) scale(0);
+      position: absolute; top: 46%; left: 50%; transform: translate(-50%, -50%) scale(0);
       background: rgba(11, 15, 30, 0.96); padding: 28px 36px; border-radius: 28px;
       text-align: center; color: white; z-index: 200;
       box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       border: 4px solid #f59e0b;
     }
-    #winner-title { font-size: 34px; font-weight: 900; margin-bottom: 8px; }
-    #winner-sub { font-size: 17px; color: #94a3b8; }
+    #winner-title { font-size: 32px; font-weight: 900; margin-bottom: 8px; }
+    #winner-sub { font-size: 16px; color: #94a3b8; }
 
     /* Hidden Testing Panel */
     #test-panel {
@@ -162,33 +162,34 @@
 
   <!-- Top Player Cards -->
   <div id="top-bar">
-    <!-- RONALDO CARD -->
+    <!-- RONALDO -->
     <div class="player-card ronaldo-card">
       <div class="ronaldo-tag">CR7</div>
       <div class="ronaldo-name">RONALDO</div>
       <div class="gift-big-icon">🌹</div>
       <div class="gift-rule-txt">1 Rose</div>
-      <div class="pull-indicator pull-red">◄ PULL LEFT</div>
+      <div class="pull-indicator pull-red">◄ SLAM LEFT</div>
       <div class="score-badge" id="ronaldo-score">0</div>
     </div>
 
+    <!-- Center Timer -->
     <div id="timer-box">
-      <div id="timer-label">MATCH TIME</div>
+      <div id="timer-label">ARM WRESTLE</div>
       <div id="timer-display">02:00</div>
     </div>
 
-    <!-- MESSI CARD -->
+    <!-- MESSI -->
     <div class="player-card messi-card">
       <div class="messi-tag">LM10</div>
       <div class="messi-name">MESSI</div>
       <div class="gift-big-icon">🍩</div>
       <div class="gift-rule-txt">Other Gift</div>
-      <div class="pull-indicator pull-blue">PULL RIGHT ►</div>
+      <div class="pull-indicator pull-blue">SLAM RIGHT ►</div>
       <div class="score-badge" id="messi-score">0</div>
     </div>
   </div>
 
-  <!-- Dynamic Tension Meter -->
+  <!-- Dynamic Arm Wrestling Tension Meter -->
   <div id="meter-container">
     <div id="ronaldo-meter"></div>
     <div id="messi-meter"></div>
@@ -198,16 +199,16 @@
 
   <!-- Victory Banner -->
   <div id="winner-banner">
-    <div id="winner-title">🏆 RONALDO WINS! SIUUU!</div>
-    <div id="winner-sub">Next match starting in 5 seconds...</div>
+    <div id="winner-title">🏆 RONALDO PINNED MESSI! SIUUU!</div>
+    <div id="winner-sub">Next round starting in 5 seconds...</div>
   </div>
 
   <!-- Hidden Test Controls -->
   <div id="test-panel">
-    <button class="btn-red" onclick="testPull('ronaldo', 1)">+1 Rose (Ronaldo)</button>
-    <button class="btn-red" onclick="testPull('ronaldo', 20)">+20 Ronaldo</button>
-    <button class="btn-blue" onclick="testPull('messi', 1)">+1 Blue (Messi)</button>
-    <button class="btn-blue" onclick="testPull('messi', 20)">+20 Messi</button>
+    <button class="btn-red" onclick="testSlam('ronaldo', 1)">+1 Rose (Ronaldo)</button>
+    <button class="btn-red" onclick="testSlam('ronaldo', 20)">+20 Ronaldo</button>
+    <button class="btn-blue" onclick="testSlam('messi', 1)">+1 Blue (Messi)</button>
+    <button class="btn-blue" onclick="testSlam('messi', 20)">+20 Messi</button>
     <button style="background:#64748b; color:white;" onclick="resetRound()">Reset</button>
   </div>
 
@@ -220,186 +221,387 @@
     canvas.width = WIDTH;
     canvas.height = HEIGHT;
 
-    // Game Physics State
-    let ropeX = WIDTH / 2;
-    let targetRopeX = WIDTH / 2;
-    const ropeY = HEIGHT * 0.62;
-    const maxOffset = 390;
-    const minX = (WIDTH / 2) - maxOffset;
-    const maxX = (WIDTH / 2) + maxOffset;
+    // Load High-Res Facial Portraits
+    const ronaldoImg = new Image();
+    ronaldoImg.crossOrigin = "anonymous";
+    ronaldoImg.src = "https://upload.wikimedia.org/wikipedia/commons/8/8c/Cristiano_Ronaldo_2018.jpg";
 
+    const messiImg = new Image();
+    messiImg.crossOrigin = "anonymous";
+    messiImg.src = "https://upload.wikimedia.org/wikipedia/commons/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg";
+
+    // Arm Wrestling State
+    // angle: -1.0 (Full Ronaldo slam left) to +1.0 (Full Messi slam right)
+    let currentAngle = 0;
+    let targetAngle = 0;
     let ronaldoWins = 0;
     let messiWins = 0;
     let roundActive = true;
-    let roundTime = 120; // 2 minutes
+    let roundTime = 120;
+    let shakeIntensity = 0;
 
-    const pullers = [];
+    const cheers = []; // Viewer avatar cheers
 
-    // --- GAME LOOP ---
+    // Table Geometry
+    const tableY = 1220;
+    const tableWidth = 840;
+    const tableLeft = (WIDTH - tableWidth) / 2;
+    const tableRight = tableLeft + tableWidth;
+
+    // Fixed Elbow Positions on Table Pads
+    const ronaldoElbow = { x: 380, y: tableY };
+    const messiElbow = { x: 700, y: tableY };
+
+    // Neutral Gripped Hands Position
+    const neutralHandX = (ronaldoElbow.x + messiElbow.x) / 2;
+    const neutralHandY = tableY - 260;
+
+    // --- MAIN RENDER & ANIMATION LOOP ---
     function update() {
-      ropeX += (targetRopeX - ropeX) * 0.12;
+      // Natural effort vibration/tremble
+      const tremor = (Math.random() - 0.5) * (0.015 + Math.abs(currentAngle) * 0.02);
+      currentAngle += (targetAngle - currentAngle) * 0.12 + tremor;
 
-      // Update Meter Bar
-      const ronaldoPercent = Math.max(5, Math.min(95, ((maxX - ropeX) / (maxOffset * 2)) * 100));
-      document.getElementById('ronaldo-meter').style.width = `${ronaldoPercent}%`;
-      document.getElementById('messi-meter').style.width = `${100 - ronaldoPercent}%`;
+      // Shake decay
+      if (shakeIntensity > 0) shakeIntensity *= 0.9;
 
-      // Check Match End Conditions
+      // Check Pins (Threshold = +/- 0.88)
       if (roundActive) {
-        if (ropeX <= minX + 15) {
+        if (currentAngle <= -0.88) {
           endRound('RONALDO');
-        } else if (ropeX >= maxX - 15) {
+        } else if (currentAngle >= 0.88) {
           endRound('MESSI');
         }
       }
+
+      // Update Meter Bar
+      // -1 -> 95% red, +1 -> 5% red
+      const redPercent = Math.max(5, Math.min(95, ((1 - currentAngle) / 2) * 100));
+      document.getElementById('ronaldo-meter').style.width = `${redPercent}%`;
+      document.getElementById('messi-meter').style.width = `${100 - redPercent}%`;
 
       render();
       requestAnimationFrame(update);
     }
 
     function render() {
+      ctx.save();
+      if (shakeIntensity > 0.5) {
+        ctx.translate((Math.random() - 0.5) * shakeIntensity, (Math.random() - 0.5) * shakeIntensity);
+      }
+
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-      // --- Pitch Center Dashed Line ---
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-      ctx.setLineDash([16, 16]);
-      ctx.beginPath();
-      ctx.moveTo(WIDTH / 2, 290);
-      ctx.lineTo(WIDTH / 2, HEIGHT - 100);
-      ctx.stroke();
-      ctx.setLineDash([]);
+      // --- 1. ARENA SPOTLIGHTS & BACKGROUND ---
+      const grad = ctx.createRadialGradient(WIDTH / 2, tableY - 200, 50, WIDTH / 2, tableY - 200, 700);
+      grad.addColorStop(0, 'rgba(30, 41, 59, 0.6)');
+      grad.addColorStop(1, 'rgba(8, 9, 17, 1)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-      // Ronaldo Goal Boundary (Left)
-      ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.moveTo(minX, ropeY - 150);
-      ctx.lineTo(minX, ropeY + 150);
-      ctx.stroke();
+      // --- 2. SENDER AVATAR POPUP CHEERS ---
+      for (let i = cheers.length - 1; i >= 0; i--) {
+        const c = cheers[i];
+        c.y += c.vy;
+        c.life -= 0.016;
 
-      // Messi Goal Boundary (Right)
-      ctx.strokeStyle = '#38bdf8';
-      ctx.beginPath();
-      ctx.moveTo(maxX, ropeY - 150);
-      ctx.lineTo(maxX, ropeY + 150);
-      ctx.stroke();
-
-      // --- The Heavy Rope ---
-      ctx.lineWidth = 22;
-      ctx.strokeStyle = '#78350f';
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(minX - 100, ropeY);
-      ctx.lineTo(maxX + 100, ropeY);
-      ctx.stroke();
-
-      // Center Soccer Ball Indicator
-      ctx.save();
-      ctx.shadowBlur = 35;
-      ctx.shadowColor = ropeX < WIDTH / 2 ? '#ef4444' : '#38bdf8';
-
-      // Ball Outer Glow
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(ropeX, ropeY, 32, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Soccer Ball Pattern Details
-      ctx.fillStyle = '#0f172a';
-      ctx.beginPath();
-      ctx.arc(ropeX, ropeY, 14, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = ropeX < WIDTH / 2 ? '#ef4444' : '#38bdf8';
-      ctx.stroke();
-      ctx.restore();
-
-      // --- Draw Active Pullers (Avatars) ---
-      for (let i = pullers.length - 1; i >= 0; i--) {
-        const p = pullers[i];
-        p.y += p.vy;
-        p.life -= 0.015;
-
-        if (p.life <= 0) {
-          pullers.splice(i, 1);
+        if (c.life <= 0) {
+          cheers.splice(i, 1);
           continue;
         }
 
         ctx.save();
-        ctx.globalAlpha = Math.min(1, p.life * 2);
+        ctx.globalAlpha = Math.min(1, c.life * 2);
 
-        // Rope connection string
-        ctx.strokeStyle = p.team === 'ronaldo' ? 'rgba(239, 68, 68, 0.45)' : 'rgba(56, 189, 248, 0.45)';
+        // Power beam to wrestler
+        ctx.strokeStyle = c.team === 'ronaldo' ? 'rgba(239, 68, 68, 0.4)' : 'rgba(56, 189, 248, 0.4)';
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.moveTo(p.x, p.y);
-        ctx.lineTo(p.anchorX, ropeY);
+        ctx.moveTo(c.x, c.y);
+        ctx.lineTo(c.team === 'ronaldo' ? 240 : 840, 780);
         ctx.stroke();
 
-        // Avatar Body
+        // Avatar Bubble
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = p.team === 'ronaldo' ? '#ef4444' : '#38bdf8';
+        ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2);
+        ctx.fillStyle = c.team === 'ronaldo' ? '#ef4444' : '#38bdf8';
         ctx.fill();
 
-        if (p.img && p.img.complete) {
+        if (c.img && c.img.complete) {
           ctx.save();
           ctx.clip();
-          ctx.drawImage(p.img, p.x - p.radius, p.y - p.radius, p.radius * 2, p.radius * 2);
+          ctx.drawImage(c.img, c.x - c.radius, c.y - c.radius, c.radius * 2, c.radius * 2);
           ctx.restore();
         }
 
-        // Circular Rim
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = p.team === 'ronaldo' ? '#ef4444' : '#38bdf8';
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#ffffff';
         ctx.stroke();
 
-        // Supporter Name
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 20px sans-serif';
+        ctx.font = 'bold 18px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(p.name, p.x, p.y - p.radius - 8);
-
+        ctx.fillText(c.name, c.x, c.y - c.radius - 6);
         ctx.restore();
       }
+
+      // --- 3. WRESTLER BODIES & FACES ---
+      drawWrestler('ronaldo', 240, 780, ronaldoImg, currentAngle);
+      drawWrestler('messi', 840, 780, messiImg, currentAngle);
+
+      // --- 4. ARM WRESTLING COMPETITION TABLE ---
+      drawTable();
+
+      // --- 5. FOREARMS & LOCKED HANDS (DYNAMIC SLAM) ---
+      drawArmWrestleMechanics();
+
+      ctx.restore();
     }
 
-    // --- PULL LOGIC ---
-    function triggerPull(team, coins, name, avatarUrl) {
-      if (!roundActive) return;
+    // --- DRAW WRESTLER BODY & FACIAL PORTRAIT ---
+    function drawWrestler(player, headX, headY, img, angle) {
+      ctx.save();
 
-      const pullPower = Math.min(180, 8 * coins);
-      if (team === 'ronaldo') {
-        targetRopeX = Math.max(minX, targetRopeX - pullPower);
+      const isRonaldo = player === 'ronaldo';
+      const mainColor = isRonaldo ? '#dc2626' : '#0284c7';
+      const secColor = isRonaldo ? '#991b1b' : '#38bdf8';
+
+      // Muscular Torso leaning in
+      ctx.fillStyle = mainColor;
+      ctx.beginPath();
+      if (isRonaldo) {
+        ctx.moveTo(headX - 110, headY + 160);
+        ctx.lineTo(headX + 90, headY + 130);
+        ctx.lineTo(ronaldoElbow.x + 30, tableY + 30);
+        ctx.lineTo(headX - 150, tableY + 30);
       } else {
-        targetRopeX = Math.min(maxX, targetRopeX + pullPower);
+        ctx.moveTo(headX + 110, headY + 160);
+        ctx.lineTo(headX - 90, headY + 130);
+        ctx.lineTo(messiElbow.x - 30, tableY + 30);
+        ctx.lineTo(headX + 150, tableY + 30);
+      }
+      ctx.closePath();
+      ctx.fill();
+
+      // Jersey Number / Trim
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 38px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(isRonaldo ? '7' : '10', isRonaldo ? headX - 20 : headX + 20, headY + 240);
+
+      // Circular Glowing Face Frame
+      const faceRadius = 90;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(headX, headY, faceRadius, 0, Math.PI * 2);
+      ctx.shadowBlur = 25;
+      ctx.shadowColor = mainColor;
+      ctx.fillStyle = '#1e293b';
+      ctx.fill();
+
+      // Clip portrait image
+      if (img && img.complete) {
+        ctx.save();
+        ctx.clip();
+        ctx.drawImage(img, headX - faceRadius, headY - faceRadius, faceRadius * 2, faceRadius * 2);
+        ctx.restore();
+      } else {
+        // Fallback text avatar if CDN slows
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 32px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(isRonaldo ? 'CR7' : 'LM10', headX, headY + 10);
       }
 
-      // Spawn visual pulling entity
-      const anchorX = team === 'ronaldo' ? ropeX - 70 : ropeX + 70;
-      const spawnX = team === 'ronaldo' ? anchorX - 80 - Math.random() * 80 : anchorX + 80 + Math.random() * 80;
-      const spawnY = ropeY + (Math.random() * 130 - 65);
+      // Face Border
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = mainColor;
+      ctx.stroke();
+      ctx.restore();
 
-      const puller = {
+      // Straining Sweat Drops when losing
+      const isLosing = (isRonaldo && angle > 0.3) || (!isRonaldo && angle < -0.3);
+      if (isLosing) {
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath();
+        ctx.arc(headX + (isRonaldo ? 55 : -55), headY - 20, 8, 0, Math.PI * 2);
+        ctx.arc(headX + (isRonaldo ? 70 : -70), headY + 30, 6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    // --- DRAW TOURNAMENT TABLE ---
+    function drawTable() {
+      ctx.save();
+
+      // Table Legs
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(tableLeft + 60, tableY + 50, 40, HEIGHT - tableY);
+      ctx.fillRect(tableRight - 100, tableY + 50, 40, HEIGHT - tableY);
+
+      // Metal table base support
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(tableLeft + 20, HEIGHT - 180, tableWidth - 40, 30);
+
+      // Main Table Surface
+      const tableGrad = ctx.createLinearGradient(0, tableY, 0, tableY + 50);
+      tableGrad.addColorStop(0, '#334155');
+      tableGrad.addColorStop(1, '#1e293b');
+      ctx.fillStyle = tableGrad;
+      ctx.fillRect(tableLeft, tableY, tableWidth, 50);
+
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#475569';
+      ctx.strokeRect(tableLeft, tableY, tableWidth, 50);
+
+      // Elbow Pads
+      // Ronaldo Elbow Pad (Red)
+      ctx.fillStyle = '#dc2626';
+      ctx.fillRect(ronaldoElbow.x - 45, tableY - 14, 90, 14);
+      ctx.strokeStyle = '#f87171';
+      ctx.strokeRect(ronaldoElbow.x - 45, tableY - 14, 90, 14);
+
+      // Messi Elbow Pad (Sky Blue)
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(messiElbow.x - 45, tableY - 14, 90, 14);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.strokeRect(messiElbow.x - 45, tableY - 14, 90, 14);
+
+      // Touchdown Pin Pads (Where hands slam to score)
+      // Left Pin Pad (Ronaldo's win target)
+      ctx.fillStyle = '#991b1b';
+      ctx.fillRect(tableLeft + 60, tableY - 26, 70, 26);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText('CR7 WIN', tableLeft + 68, tableY - 9);
+
+      // Right Pin Pad (Messi's win target)
+      ctx.fillStyle = '#0369a1';
+      ctx.fillRect(tableRight - 130, tableY - 26, 70, 26);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('LM10 WIN', tableRight - 126, tableY - 9);
+
+      ctx.restore();
+    }
+
+    // --- DRAW ARMS & CLASH MECHANICS ---
+    function drawArmWrestleMechanics() {
+      ctx.save();
+
+      // Hand position calculations
+      // Range: max tilt left (currentAngle = -1) -> X=210, Y=tableY-25
+      //        max tilt right (currentAngle = +1) -> X=870, Y=tableY-25
+      const slamTiltX = currentAngle * 320;
+      const slamTiltY = Math.abs(currentAngle) * 210;
+
+      const handX = neutralHandX + slamTiltX;
+      const handY = neutralHandY + slamTiltY;
+
+      // 1. Ronaldo's Arm (Portugal Red / Tanned skin)
+      drawMuscularArm(ronaldoElbow.x, ronaldoElbow.y, handX, handY, '#fca5a5', '#dc2626', true);
+
+      // 2. Messi's Arm (Argentina Blue / Fair skin)
+      drawMuscularArm(messiElbow.x, messiElbow.y, handX, handY, '#fed7aa', '#0284c7', false);
+
+      // 3. Clenched Hands & Grip Flash
+      ctx.save();
+      ctx.shadowBlur = 30;
+      ctx.shadowColor = currentAngle < 0 ? '#ef4444' : '#38bdf8';
+
+      // Energy clash core
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(handX, handY, 26, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Locked knuckles
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = currentAngle < 0 ? '#ef4444' : '#38bdf8';
+      ctx.stroke();
+
+      // Spark lines at the locked grip
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 3;
+      for (let s = 0; s < 4; s++) {
+        const ang = (Math.PI / 2) * s + Math.random();
+        ctx.beginPath();
+        ctx.moveTo(handX + Math.cos(ang) * 15, handY + Math.sin(ang) * 15);
+        ctx.lineTo(handX + Math.cos(ang) * 40, handY + Math.sin(ang) * 40);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      ctx.restore();
+    }
+
+    function drawMuscularArm(elbowX, elbowY, handX, handY, skinTone, sleeveColor, isLeft) {
+      ctx.save();
+
+      // Forearm line / muscle thickness
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = skinTone;
+      ctx.lineWidth = 42;
+
+      ctx.beginPath();
+      ctx.moveTo(elbowX, elbowY);
+      ctx.lineTo(handX, handY);
+      ctx.stroke();
+
+      // Forearm Muscle Outline
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+      ctx.stroke();
+
+      // Jersey Sleeve at elbow base
+      ctx.strokeStyle = sleeveColor;
+      ctx.lineWidth = 48;
+      ctx.beginPath();
+      ctx.moveTo(elbowX, elbowY);
+      ctx.lineTo(elbowX + (isLeft ? 30 : -30), elbowY - 20);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // --- PUSH / SLAM LOGIC ---
+    function triggerSlam(team, coins, name, avatarUrl) {
+      if (!roundActive) return;
+
+      shakeIntensity = Math.min(25, 4 + coins * 0.8);
+
+      // Scale power based on coins
+      const power = Math.min(0.45, 0.05 * Math.log2(coins + 1) + 0.03);
+
+      if (team === 'ronaldo') {
+        targetAngle = Math.max(-1.0, targetAngle - power);
+      } else {
+        targetAngle = Math.min(1.0, targetAngle + power);
+      }
+
+      // Add supporter cheer entity
+      const isRonaldo = team === 'ronaldo';
+      const spawnX = isRonaldo ? 160 + Math.random() * 140 : 780 + Math.random() * 140;
+      const spawnY = 880 + (Math.random() * 140 - 70);
+
+      const cheer = {
         team: team,
         name: name,
         x: spawnX,
         y: spawnY,
-        anchorX: anchorX,
-        vy: -0.6,
+        vy: -0.7,
         radius: coins >= 100 ? 46 : 34,
         life: 1.0,
         img: null
       };
 
       if (avatarUrl) {
-        puller.img = new Image();
-        puller.img.src = avatarUrl;
+        cheer.img = new Image();
+        cheer.img.src = avatarUrl;
       }
 
-      pullers.push(puller);
+      cheers.push(cheer);
     }
 
     // --- ROUND RESOLUTION ---
@@ -411,13 +613,13 @@
       if (winner === 'RONALDO') {
         ronaldoWins++;
         document.getElementById('ronaldo-score').innerText = ronaldoWins;
-        title.innerHTML = '🏆 RONALDO WINS! SIUUU! 🇵🇹';
+        title.innerHTML = '🏆 RONALDO PINNED MESSI! SIUUU! 🇵🇹';
         title.style.color = '#ef4444';
         banner.style.borderColor = '#ef4444';
       } else {
         messiWins++;
         document.getElementById('messi-score').innerText = messiWins;
-        title.innerHTML = '🏆 MESSI WINS! GOAT! 🇦🇷';
+        title.innerHTML = '🏆 MESSI PINNED RONALDO! ANKARA MESSI! 🇦🇷';
         title.style.color = '#38bdf8';
         banner.style.borderColor = '#38bdf8';
       }
@@ -432,14 +634,14 @@
     function resetRound() {
       const banner = document.getElementById('winner-banner');
       banner.style.transform = 'translate(-50%, -50%) scale(0)';
-      targetRopeX = WIDTH / 2;
-      ropeX = WIDTH / 2;
-      pullers.length = 0;
+      targetAngle = 0;
+      currentAngle = 0;
+      cheers.length = 0;
       roundTime = 120;
       roundActive = true;
     }
 
-    // --- TIMER COUNTDOWN ---
+    // --- MATCH COUNTDOWN TIMER ---
     setInterval(() => {
       if (!roundActive) return;
       if (roundTime > 0) {
@@ -448,8 +650,9 @@
         const secs = String(roundTime % 60).padStart(2, '0');
         document.getElementById('timer-display').innerText = `${mins}:${secs}`;
       } else {
-        if (ropeX < WIDTH / 2) endRound('RONALDO');
-        else if (ropeX > WIDTH / 2) endRound('MESSI');
+        // Time expired: whichever side has the slam advantage wins
+        if (currentAngle < -0.05) endRound('RONALDO');
+        else if (currentAngle > 0.05) endRound('MESSI');
         else resetRound();
       }
     }, 1000);
@@ -460,8 +663,8 @@
       p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
     };
 
-    window.testPull = function(team, coins) {
-      triggerPull(team, coins, team.toUpperCase(), null);
+    window.testSlam = function(team, coins) {
+      triggerSlam(team, coins, team.toUpperCase(), null);
     };
 
     // --- WEBSOCKET EVENT LISTENER ---
@@ -472,9 +675,9 @@
       const data = JSON.parse(msg.data);
       if (data.type === 'GIFT') {
         const gift = (data.giftName || '').toLowerCase();
-        // Rose sends points to Ronaldo (Left). Any other gift pulls for Messi (Right)!
+        // Rose (1 Coin) pulls for Ronaldo, any other gift pulls for Messi!
         const team = gift.includes('rose') ? 'ronaldo' : 'messi';
-        triggerPull(team, data.diamondCount || 1, data.username, data.avatar);
+        triggerSlam(team, data.diamondCount || 1, data.username, data.avatar);
       }
     };
 
