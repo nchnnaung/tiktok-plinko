@@ -7,19 +7,30 @@
   <style>
     body { margin: 0; background: #0b0c16; overflow: hidden; font-family: sans-serif; }
     #canvas-box { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    
+    /* Hidden by default; only shows when toggled */
     #test-panel {
       position: absolute; bottom: 20px; left: 20px; z-index: 100;
-      display: flex; gap: 10px; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 8px;
+      display: none; gap: 10px; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 8px;
     }
     button {
       background: #38bdf8; border: none; padding: 8px 14px;
       border-radius: 6px; font-weight: bold; cursor: pointer; color: #000;
     }
+
+    /* Invisible secret tap zone at the top of the screen */
+    #secret-tap-zone {
+      position: absolute; top: 0; left: 0; width: 100%; height: 80px; z-index: 200;
+    }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
 <body>
+  <!-- Tap here to show/hide the test buttons -->
+  <div id="secret-tap-zone" onclick="toggleTestPanel()"></div>
+
   <div id="canvas-box"></div>
+
   <div id="test-panel">
     <button onclick="testDrop(1)">Test 1</button>
     <button onclick="testDrop(30)">Test 30</button>
@@ -43,13 +54,11 @@
     Render.run(render);
     Runner.run(Runner.create(), engine);
 
-    // Boundary walls
     Composite.add(world, [
       Bodies.rectangle(-10, height / 2, 20, height, { isStatic: true }),
       Bodies.rectangle(width + 10, height / 2, 20, height, { isStatic: true })
     ]);
 
-    // Pegs
     const rows = 11;
     const startY = 350;
     const spacingY = 85;
@@ -68,7 +77,6 @@
       }
     }
 
-    // Multiplier bottom boxes
     const mults = [50, 10, 2, 0.5, 2, 10, 50];
     const binW = width / mults.length;
     const binY = 1600;
@@ -89,7 +97,6 @@
       Composite.add(world, sensor);
     });
 
-    // Draw Multiplier Text over the boxes
     Events.on(render, 'afterRender', () => {
       const ctx = render.context;
       ctx.font = 'bold 36px sans-serif';
@@ -104,7 +111,6 @@
       });
     });
 
-    // Clean up balls upon landing
     Events.on(engine, 'collisionStart', (e) => {
       e.pairs.forEach(({ bodyA, bodyB }) => {
         const ball = bodyA.label === 'ball' ? bodyA : (bodyB.label === 'ball' ? bodyB : null);
@@ -133,6 +139,12 @@
         }, i * 150);
       }
     }
+
+    // Toggle Secret Function
+    window.toggleTestPanel = function() {
+      const panel = document.getElementById('test-panel');
+      panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
+    };
 
     window.testDrop = function(coins) {
       dropAvatar("Tester", null, coins);
