@@ -2,126 +2,169 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TikTok Plinko</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TikTok Plinko Live</title>
   <style>
-    body { margin: 0; background: #0b0c16; overflow: hidden; font-family: sans-serif; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #0b0c16;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
     #canvas-box { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-    /* --- Neon Sidebar Gift Rules (Placed in Vacant Left/Right Gaps) --- */
-    .sidebar-rules {
+    /* --- SIDEBAR CONTAINER POSITIONING --- */
+    .rules-sidebar {
       position: absolute;
-      top: 130px; /* Aligned perfectly to the upper-middle side voids */
-      z-index: 50;
+      top: 110px; /* Positioned in the shoulder gaps */
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
+      z-index: 50;
       pointer-events: none;
     }
-    
-    #rules-left { left: 24px; }
-    #rules-right { right: 24px; }
+    #rules-left {
+      left: 14px;
+    }
+    #rules-right {
+      right: 14px;
+    }
 
-    /* Basic & Epic Box Stylings */
+    /* --- BIGGER CARD STYLING --- */
     .rule-card {
-      background: rgba(18, 20, 38, 0.85);
-      border: 2px solid #38bdf8;
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.35);
-      border-radius: 16px;
-      padding: 10px 14px;
-      width: 145px;
-      color: white;
+      width: 115px;
+      background: rgba(15, 23, 42, 0.92);
+      border-radius: 14px;
+      padding: 10px 6px;
       text-align: center;
-      transition: all 0.3s ease;
-    }
-    
-    .rule-card.special {
-      border-color: #f59e0b;
-      box-shadow: 0 0 15px rgba(245, 158, 11, 0.35);
+      color: #ffffff;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
     }
 
-    .rule-card .header-title {
-      font-size: 11px;
+    /* Left Side: Cyan / Blue Glow */
+    .card-blue {
+      border: 2px solid #38bdf8;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+    }
+    .badge-blue {
+      background: #0284c7;
+      color: #fff;
+    }
+    .ball-blue {
+      color: #38bdf8;
+      text-shadow: 0 0 8px rgba(56, 189, 248, 0.7);
+    }
+
+    /* Right Side: Gold / Orange Glow */
+    .card-gold {
+      border: 2px solid #f59e0b;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+    }
+    .badge-gold {
+      background: #d97706;
+      color: #fff;
+    }
+    .ball-gold {
+      color: #fbbf24;
+      text-shadow: 0 0 8px rgba(245, 158, 11, 0.7);
+    }
+
+    /* Card Details */
+    .tier-badge {
+      font-size: 10px;
       font-weight: 900;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+      padding: 3px 6px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 6px;
     }
-    .rule-card .header-title.basic { color: #38bdf8; text-shadow: 0 0 5px rgba(56, 189, 248, 0.5); }
-    .rule-card .header-title.epic { color: #f59e0b; text-shadow: 0 0 5px rgba(245, 158, 11, 0.5); }
+    .gift-icon {
+      font-size: 32px;
+      line-height: 1.1;
+      margin-bottom: 2px;
+    }
+    .gift-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+    .arrow {
+      font-size: 11px;
+      color: #64748b;
+      margin: 2px 0;
+    }
+    .ball-count {
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+    }
 
-    .rule-card .icon { font-size: 28px; display: block; margin-bottom: 2px; }
-    .rule-card .gift-name { font-size: 13px; font-weight: 700; color: #94a3b8; }
-    .rule-card .equals { font-size: 12px; font-weight: 600; color: #475569; margin: 2px 0; }
-    .rule-card .outcome { font-size: 15px; font-weight: 900; color: #38bdf8; }
-    .rule-card.special .outcome { color: #f59e0b; }
-
-    /* Hidden testing options panel */
+    /* Hidden testing buttons */
     #test-panel {
-      position: absolute; bottom: 20px; left: 20px; z-index: 100;
-      display: none; gap: 8px; background: rgba(0,0,0,0.6); padding: 8px; border-radius: 8px;
+      position: absolute; bottom: 15px; left: 15px; z-index: 100;
+      display: none; gap: 8px; background: rgba(0,0,0,0.7); padding: 8px; border-radius: 8px;
     }
     button {
-      background: #38bdf8; border: none; padding: 8px 12px;
-      border-radius: 6px; font-weight: bold; cursor: pointer; color: #000;
-      font-size: 12px;
+      background: #38bdf8; border: none; padding: 7px 10px;
+      border-radius: 5px; font-weight: bold; cursor: pointer; color: #000; font-size: 11px;
     }
 
-    /* Secret double-tap zone */
+    /* Secret tap area at top of screen */
     #secret-tap-zone {
-      position: absolute; top: 0; left: 0; width: 100%; height: 75px; z-index: 60;
+      position: absolute; top: 0; left: 0; width: 100%; height: 70px; z-index: 60;
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
 <body>
-  <!-- Hidden Toggler top-trigger zone -->
+  <!-- Secret Tap Zone to toggle test buttons -->
   <div id="secret-tap-zone" onclick="toggleTestPanel()"></div>
 
-  <!-- Left Sidebar (Basic Tier) -->
-  <div class="sidebar-rules" id="rules-left">
-    <div class="rule-card">
-      <div class="header-title basic">🎁 BASIC TIER</div>
-      <span class="icon">🌹</span>
+  <!-- LEFT SIDE: Basic & Multi-Drop -->
+  <div class="rules-sidebar" id="rules-left">
+    <div class="rule-card card-blue">
+      <div class="tier-badge badge-blue">BASIC</div>
+      <div class="gift-icon">🌹</div>
       <div class="gift-name">1 Rose</div>
-      <div class="equals">=</div>
-      <div class="outcome">1 BALL</div>
+      <div class="arrow">▼</div>
+      <div class="ball-count ball-blue">1 BALL</div>
     </div>
-    <div class="rule-card">
-      <div class="header-title basic">🍩 MULTI-DROP</div>
-      <span class="icon">🍩</span>
+    <div class="rule-card card-blue">
+      <div class="tier-badge badge-blue">MULTI-DROP</div>
+      <div class="gift-icon">🍩</div>
       <div class="gift-name">30 Coins</div>
-      <div class="equals">=</div>
-      <div class="outcome">5 BALLS</div>
+      <div class="arrow">▼</div>
+      <div class="ball-count ball-blue">5 BALLS</div>
     </div>
   </div>
 
-  <!-- Right Sidebar (Epic/Legendary Tier) -->
-  <div class="sidebar-rules" id="rules-right">
-    <div class="rule-card special">
-      <div class="header-title epic">🔥 EPIC TIER</div>
-      <span class="icon">🎉</span>
+  <!-- RIGHT SIDE: Epic & Legendary -->
+  <div class="rules-sidebar" id="rules-right">
+    <div class="rule-card card-gold">
+      <div class="tier-badge badge-gold">EPIC TIER</div>
+      <div class="gift-icon">🎉</div>
       <div class="gift-name">100 Coins</div>
-      <div class="equals">=</div>
-      <div class="outcome">15 BALLS</div>
+      <div class="arrow">▼</div>
+      <div class="ball-count ball-gold">15 BALLS</div>
     </div>
-    <div class="rule-card special">
-      <div class="header-title epic">🦁 LEGENDARY</div>
-      <span class="icon">🦁</span>
+    <div class="rule-card card-gold">
+      <div class="tier-badge badge-gold">LEGENDARY</div>
+      <div class="gift-icon">🦁</div>
       <div class="gift-name">1000+ Coins</div>
-      <div class="equals">=</div>
-      <div class="outcome">150 BALLS</div>
+      <div class="arrow">▼</div>
+      <div class="ball-count ball-gold">150 BALLS</div>
     </div>
   </div>
 
   <div id="canvas-box"></div>
 
-  <!-- Updated tester triggers for our new sizes -->
   <div id="test-panel">
     <button onclick="testDrop(1)">Test 1</button>
     <button onclick="testDrop(30)">Test 30</button>
     <button onclick="testDrop(100)">Test 100</button>
-    <button onclick="testDrop(1000)">Test 1000</button>
+    <button onclick="testDrop(1000)">Test 150</button>
   </div>
 
   <script>
@@ -141,11 +184,13 @@
     Render.run(render);
     Runner.run(Runner.create(), engine);
 
+    // Boundary walls
     Composite.add(world, [
       Bodies.rectangle(-10, height / 2, 20, height, { isStatic: true }),
       Bodies.rectangle(width + 10, height / 2, 20, height, { isStatic: true })
     ]);
 
+    // Pegs
     const rows = 11;
     const startY = 350;
     const spacingY = 85;
@@ -164,6 +209,7 @@
       }
     }
 
+    // Bottom Bins
     const mults = [50, 10, 2, 0.5, 2, 10, 50];
     const binW = width / mults.length;
     const binY = 1600;
@@ -211,8 +257,6 @@
 
     function dropAvatar(name, avatarUrl, coins) {
       let count = 1;
-      
-      // Match the drop logic perfectly with the side rule sizes!
       if (coins >= 1000) count = 150;
       else if (coins >= 100) count = 15;
       else if (coins >= 30) count = 5;
