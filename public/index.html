@@ -3,298 +3,102 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Ronaldo vs Messi - Race to 1000 Goals</title>
+  <title>Avatar Bumper Arena - Sumo Battle Royale</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    
     body {
-      background: #020713;
+      background: #050711;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       user-select: none;
       height: 100vh;
       width: 100vw;
-      display: flex;
-      flex-direction: column;
     }
 
-    /* Secret tap area at top of screen to toggle offline test buttons */
+    /* Secret tap area at top of screen to toggle testing buttons */
     #secret-tap-zone {
-      position: absolute; top: 0; left: 0; width: 100%; height: 50px; z-index: 100;
+      position: absolute; top: 0; left: 0; width: 100%; height: 60px; z-index: 100;
     }
 
-    /* --- COMMON SECTION STYLING (NAVY DOTTED STADIUM PATTERN) --- */
-    .half-section {
-      flex: 1;
-      position: relative;
-      display: flex;
-      padding: 16px 12px;
-      overflow: hidden;
-      background-color: #030b1b;
-      background-image: 
-        radial-gradient(circle at 10% 40%, rgba(20, 55, 115, 0.45) 0%, transparent 70%),
-        radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
-      background-size: 100% 100%, 18px 18px;
-    }
-
-    /* --- YELLOW CENTER DIVIDER --- */
-    #divider-line {
-      height: 4px;
-      background: #ffe600;
-      box-shadow: 0 0 14px rgba(255, 230, 0, 0.85);
-      z-index: 40;
-    }
-
-    /* --- LEFT SIDE: PLAYER CUTOUT & GIFT RULES --- */
-    .left-col {
-      width: 44%;
-      height: 100%;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      z-index: 10;
-    }
-
-    .player-cutout {
-      max-width: 125%;
-      max-height: 84%;
-      object-fit: contain;
-      filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.85));
-      transform: scale(1.08);
-      transform-origin: bottom center;
-    }
-
-    /* Glowing Gift Action Badges Tucked Beside Player */
-    .gift-rules-stack {
+    #game-canvas {
       position: absolute;
-      top: 6px;
+      top: 0;
       left: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      z-index: 25;
-      pointer-events: none;
-    }
-
-    .gift-chip {
-      background: rgba(4, 11, 28, 0.88);
-      border-radius: 10px;
-      padding: 4px 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #ffffff;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.7);
-      backdrop-filter: blur(4px);
-    }
-    .chip-ronaldo {
-      border: 1.5px solid #ffe600;
-      box-shadow: 0 0 10px rgba(255, 230, 0, 0.3);
-    }
-    .chip-messi {
-      border: 1.5px solid #f472b6;
-      box-shadow: 0 0 10px rgba(244, 114, 182, 0.3);
-    }
-
-    .chip-emoji { font-size: 18px; line-height: 1; }
-    .chip-text { font-size: 10px; font-weight: 800; color: #cbd5e1; }
-    .chip-gain { font-size: 11px; font-weight: 900; }
-    .gain-yellow { color: #ffe600; }
-    .gain-pink { color: #f472b6; }
-
-    /* --- RIGHT SIDE: STATS, PROGRESS & CLUB BREAKDOWN --- */
-    .right-col {
-      width: 56%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding-left: 8px;
-      padding-top: 10px;
-      z-index: 10;
-    }
-
-    .brand-tag {
-      align-self: flex-end;
-      font-size: 13px;
-      font-weight: 900;
-      color: rgba(255, 255, 255, 0.7);
-      letter-spacing: 0.5px;
-      margin-bottom: 2px;
-    }
-
-    /* Giant 979/1000 & 928/1000 Number */
-    .giant-score {
-      font-family: 'Impact', 'Arial Black', sans-serif;
-      font-size: 46px;
-      letter-spacing: -0.5px;
-      line-height: 0.95;
-      color: #ffe600;
-      text-shadow: 0 0 20px rgba(255, 230, 0, 0.45);
-      margin-bottom: 8px;
-    }
-
-    /* Stadium Yellow Progress Bar */
-    .progress-capsule {
       width: 100%;
-      height: 18px;
-      border: 2px solid #ffe600;
-      border-radius: 9px;
-      background: rgba(2, 7, 19, 0.7);
-      position: relative;
-      display: flex;
-      align-items: center;
-      padding: 0 6px;
-      margin-bottom: 14px;
-      box-shadow: 0 0 10px rgba(255, 230, 0, 0.25);
+      height: 100%;
     }
 
-    .progress-fill {
-      position: absolute;
-      left: 2px;
-      top: 2px;
-      bottom: 2px;
-      background: #ffe600;
-      border-radius: 6px;
-      transition: width 0.3s ease-out;
-      z-index: 1;
+    /* --- TOP LIVE HUD --- */
+    #top-hud {
+      position: absolute; top: 16px; left: 0; width: 100%;
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 0 16px; z-index: 50; pointer-events: none;
     }
 
-    .progress-label-left {
-      position: relative;
-      z-index: 2;
-      font-size: 10px;
-      font-weight: 900;
-      color: #000;
-      letter-spacing: 0.5px;
-    }
-
-    .progress-label-right {
-      position: absolute;
-      right: 6px;
-      z-index: 2;
-      font-size: 10px;
-      font-weight: 900;
-      color: #ffe600;
-    }
-
-    /* Club Badges Breakdown Row */
-    .clubs-row {
-      display: flex;
-      gap: 5px;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .club-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex: 1;
-    }
-
-    .club-badge {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(255, 255, 255, 0.35);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 8px;
-      font-weight: 900;
-      color: #fff;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
-      margin-bottom: 3px;
-    }
-
-    .club-goals {
-      font-family: 'Impact', sans-serif;
-      font-size: 15px;
-      color: #ffe600;
-      line-height: 1;
-    }
-
-    .club-subtext {
-      font-size: 8px;
-      font-weight: 800;
-      color: #94a3b8;
-      letter-spacing: 0.5px;
-    }
-
-    /* Games Played Footer Text */
-    .games-footer {
-      font-size: 11px;
-      font-weight: 900;
-      font-style: italic;
-      color: rgba(255, 255, 255, 0.85);
-      letter-spacing: 0.5px;
+    .hud-card {
+      background: rgba(15, 23, 42, 0.9);
+      border: 2px solid rgba(56, 189, 248, 0.4);
+      border-radius: 16px;
+      padding: 8px 14px;
       text-align: center;
-      margin-top: 4px;
+      color: white;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+    }
+    .hud-label { font-size: 10px; font-weight: 800; color: #94a3b8; letter-spacing: 1px; }
+    .hud-val { font-size: 22px; font-weight: 900; color: #38bdf8; }
+
+    #timer-val { color: #f59e0b; }
+
+    /* --- SIDE GIFT RULES (CLEAN FLOATING CHIPS) --- */
+    #gift-rules-left {
+      position: absolute; top: 90px; left: 14px;
+      display: flex; flex-direction: column; gap: 8px; z-index: 50; pointer-events: none;
+    }
+    #gift-rules-right {
+      position: absolute; top: 90px; right: 14px;
+      display: flex; flex-direction: column; gap: 8px; z-index: 50; pointer-events: none;
     }
 
-    /* Club Badges Color Styling */
-    .bg-sporting { background: #006633; border-color: #ffe600; }
-    .bg-manutd   { background: #da020e; border-color: #ffe600; }
-    .bg-real     { background: #ffffff; color: #000; border-color: #e5a93b; }
-    .bg-juve     { background: #000000; border-color: #ffffff; }
-    .bg-nassr    { background: #ffe600; color: #001f54; border-color: #001f54; }
-    .bg-portugal { background: #b31b1b; border-color: #006633; }
-
-    .bg-barca     { background: #a50044; border-color: #004d98; }
-    .bg-psg       { background: #001c3e; border-color: #da291c; }
-    .bg-miami     { background: #f472b6; color: #000; border-color: #000; }
-    .bg-argentina { background: #75aadb; border-color: #ffffff; }
-
-    /* --- FLOATING SUPPORTER GOAL TOKENS --- */
-    .goal-popup {
-      position: absolute;
+    .rule-chip {
+      background: rgba(11, 15, 30, 0.92);
+      border-radius: 12px;
+      padding: 6px 10px;
       display: flex;
       align-items: center;
-      gap: 6px;
-      background: rgba(4, 11, 28, 0.95);
-      padding: 6px 12px;
-      border-radius: 20px;
-      color: white;
-      font-weight: 900;
-      font-size: 13px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.85);
-      pointer-events: none;
-      z-index: 80;
-      animation: floatUp 1.8s forwards;
+      gap: 8px;
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      border: 2px solid;
     }
-    .popup-cr7 { border: 2px solid #ffe600; }
-    .popup-lm10 { border: 2px solid #f472b6; }
-    .goal-popup img {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      border: 1.5px solid #fff;
-    }
+    .chip-cyan { border-color: #38bdf8; box-shadow: 0 0 12px rgba(56, 189, 248, 0.35); }
+    .chip-gold { border-color: #f59e0b; box-shadow: 0 0 12px rgba(245, 158, 11, 0.35); }
 
-    @keyframes floatUp {
-      0% { opacity: 0; transform: translateY(15px) scale(0.8); }
-      20% { opacity: 1; transform: translateY(0) scale(1.1); }
-      80% { opacity: 1; transform: translateY(-30px) scale(1); }
-      100% { opacity: 0; transform: translateY(-55px) scale(0.8); }
-    }
+    .chip-emoji { font-size: 24px; line-height: 1; }
+    .chip-name { font-size: 11px; font-weight: 800; color: #cbd5e1; }
+    .chip-action { font-size: 13px; font-weight: 900; }
+    .txt-cyan { color: #38bdf8; }
+    .txt-gold { color: #f59e0b; }
 
-    /* --- VICTORY OVERLAY BANNER --- */
+    /* --- VICTORY BANNER --- */
     #winner-banner {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
-      background: rgba(4, 11, 28, 0.98); padding: 28px 24px; border-radius: 24px;
+      position: absolute; top: 46%; left: 50%; transform: translate(-50%, -50%) scale(0);
+      background: rgba(11, 15, 30, 0.98); padding: 30px; border-radius: 28px;
       text-align: center; color: white; z-index: 200;
       box-shadow: 0 0 60px rgba(0, 0, 0, 0.95);
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      border: 4px solid #ffe600;
-      width: 88%;
+      border: 4px solid #f59e0b; width: 88%;
     }
-    #winner-title { font-size: 30px; font-weight: 900; margin-bottom: 6px; }
-    #winner-sub { font-size: 15px; color: #94a3b8; }
+    #winner-pfp {
+      width: 90px; height: 90px; border-radius: 50%; border: 4px solid #f59e0b;
+      margin-bottom: 10px; box-shadow: 0 0 24px rgba(245, 158, 11, 0.8);
+      object-fit: cover;
+    }
+    #winner-title { font-size: 28px; font-weight: 900; margin-bottom: 6px; color: #f59e0b; }
+    #winner-sub { font-size: 15px; color: #cbd5e1; }
 
-    /* Hidden testing panel */
+    /* --- HIDDEN TESTING CONTROLS --- */
     #test-panel {
       position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
       display: none; gap: 8px; background: rgba(0,0,0,0.9); padding: 8px 12px;
@@ -304,262 +108,506 @@
       border: none; padding: 7px 11px; border-radius: 6px;
       font-weight: 900; cursor: pointer; font-size: 11px;
     }
-    .btn-cr7 { background: #ffe600; color: #000; }
-    .btn-lm10 { background: #f472b6; color: #000; }
+    .btn-spawn { background: #38bdf8; color: #000; }
+    .btn-heavy { background: #f59e0b; color: #000; }
   </style>
 </head>
 <body>
   <div id="secret-tap-zone" onclick="toggleTestPanel()"></div>
 
-  <!-- ================= TOP HALF: RONALDO ================= -->
-  <div class="half-section" id="ronaldo-half">
-    <!-- Left: Cutout & Action Chips -->
-    <div class="left-col">
-      <div class="gift-rules-stack">
-        <div class="gift-chip chip-ronaldo">
-          <span class="chip-emoji">🌹</span>
-          <div>
-            <div class="chip-text">1 Rose</div>
-            <div class="chip-gain gain-yellow">+1 GOAL</div>
-          </div>
-        </div>
-        <div class="gift-chip chip-ronaldo">
-          <span class="chip-emoji">🍩</span>
-          <div>
-            <div class="chip-text">30 Coins</div>
-            <div class="chip-gain gain-yellow">+30 GOALS</div>
-          </div>
-        </div>
-      </div>
-
-      <img class="player-cutout" 
-           src="https://images.fotmob.com/image_resources/playerimages/30955.png" 
-           alt="Ronaldo"
-           onerror="this.src='https://assets.stickpng.com/images/585ac0044f6ae202fedf2937.png'">
+  <!-- HUD -->
+  <div id="top-hud">
+    <div class="hud-card">
+      <div class="hud-label">SURVIVORS</div>
+      <div class="hud-val" id="survivors-count">0</div>
     </div>
-
-    <!-- Right: Stats, Progress & Clubs -->
-    <div class="right-col">
-      <div class="brand-tag">Sportvia</div>
-      
-      <div class="giant-score" id="ronaldo-score-text">979/1000</div>
-
-      <div class="progress-capsule">
-        <div class="progress-fill" id="ronaldo-bar" style="width: 97.9%;"></div>
-        <span class="progress-label-left">GOALS</span>
-        <span class="progress-label-right" id="ronaldo-pct-text">97.9%</span>
-      </div>
-
-      <!-- Club Breakdown Row matching your graphic -->
-      <div class="clubs-row">
-        <div class="club-item">
-          <div class="club-badge bg-sporting">SCP</div>
-          <div class="club-goals">5</div>
-          <div class="club-subtext">GOALS</div>
-        </div>
-        <div class="club-item">
-          <div class="club-badge bg-manutd">MU</div>
-          <div class="club-goals">145</div>
-          <div class="club-subtext">GOALS</div>
-        </div>
-        <div class="club-item">
-          <div class="club-badge bg-real">RMA</div>
-          <div class="club-goals">450</div>
-          <div class="club-subtext">GOALS</div>
-        </div>
-        <div class="club-item">
-          <div class="club-badge bg-juve">JUV</div>
-          <div class="club-goals">101</div>
-          <div class="club-subtext">GOALS</div>
-        </div>
-        <div class="club-item">
-          <div class="club-badge bg-nassr">NAS</div>
-          <div class="club-goals">132</div>
-          <div class="club-subtext">GOALS</div>
-        </div>
-        <div class="club-item">
-          <div class="club-badge bg-portugal">POR</div>
-          <div class="club-goals">146</div>
-          <div class="club-subtext">GOALS</div>
-        </div>
-      </div>
-
-      <div class="games-footer">AFTER 1336 GAMES SOFAR</div>
+    <div class="hud-card">
+      <div class="hud-label">SHRINKING RING</div>
+      <div class="hud-val" id="timer-val">01:30</div>
+    </div>
+    <div class="hud-card">
+      <div class="hud-label">TOTAL SPAWNS</div>
+      <div class="hud-val" id="total-spawns">0</div>
     </div>
   </div>
 
-  <!-- CENTER DIVIDER -->
-  <div id="divider-line"></div>
-
-  <!-- ================= BOTTOM HALF: MESSI ================= -->
-  <div class="half-section" id="messi-half">
-    <!-- Left: Cutout & Action Chips -->
-    <div class="left-col">
-      <div class="gift-rules-stack">
-        <div class="gift-chip chip-messi">
-          <span class="chip-emoji">⚡</span>
-          <div>
-            <div class="chip-text">TikTok Logo</div>
-            <div class="chip-gain gain-pink">+1 GOAL</div>
-          </div>
-        </div>
-        <div class="gift-chip chip-messi">
-          <span class="chip-emoji">🍩</span>
-          <div>
-            <div class="chip-text">30 Coins</div>
-            <div class="chip-gain gain-pink">+30 GOALS</div>
-          </div>
-        </div>
+  <!-- Left Gift Rules -->
+  <div id="gift-rules-left">
+    <div class="rule-chip chip-cyan">
+      <span class="chip-emoji">🌹</span>
+      <div>
+        <div class="chip-name">1 Rose</div>
+        <div class="chip-action txt-cyan">SPAWN / DASH</div>
       </div>
-
-      <img class="player-cutout" 
-           src="https://images.fotmob.com/image_resources/playerimages/30981.png" 
-           alt="Messi"
-           onerror="this.src='https://assets.stickpng.com/images/585ac0044f6ae202fedf2935.png'">
     </div>
-
-    <!-- Right: Stats, Progress & Clubs -->
-    <div class="right-col">
-      <div class="giant-score" id="messi-score-text">928/1000</div>
-
-      <div class="progress-capsule">
-        <div class="progress-fill" id="messi-bar" style="width: 92.8%;"></div>
-        <span class="progress-label-left">GOALS</span>
-        <span class="progress-label-right" id="messi-pct-text">92.8%</span>
+    <div class="rule-chip chip-cyan">
+      <span class="chip-emoji">🍩</span>
+      <div>
+        <div class="chip-name">30 Coins</div>
+        <div class="chip-action txt-cyan">ARMOR SHIELD</div>
       </div>
-
-      <!-- Club Breakdown Row matching your graphic -->
-      <div class="clubs-row">
-        <div class="club-item">
-          <div class="club-badge bg-barca">FCB</div>
-          <div class="club-goals">672</div>
-          <div class="club-subtext">GOALS</div>
-        </div>
-        <div class="club-item">
-          <div class="club-badge bg-psg">PSG</div>
-          <div class="club-goals">32</div>
-          <div class="club-subtext">GOALS</div>
-        </div>
-        <div class="club-item">
-          <div class="club-badge bg-miami">MIA</div>
-          <div class="club-goals">99</div>
-          <div class="club-subtext">GOALS</div>
-        </div>
-        <div class="club-item">
-          <div class="club-badge bg-argentina">ARG</div>
-          <div class="club-goals">125</div>
-          <div class="club-subtext">GOALS</div>
-        </div>
-      </div>
-
-      <div class="games-footer">AFTER 1173 GAMES SOFAR</div>
     </div>
   </div>
 
-  <!-- VICTORY POPUP -->
+  <!-- Right Gift Rules -->
+  <div id="gift-rules-right">
+    <div class="rule-chip chip-gold">
+      <span class="chip-emoji">🎉</span>
+      <div>
+        <div class="chip-name">100 Coins</div>
+        <div class="chip-action txt-gold">SUMO TITAN</div>
+      </div>
+    </div>
+    <div class="rule-chip chip-gold">
+      <span class="chip-emoji">🦁</span>
+      <div>
+        <div class="chip-name">1000 Coins</div>
+        <div class="chip-action txt-gold">EARTHQUAKE</div>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="game-canvas"></canvas>
+
+  <!-- Winner Banner -->
   <div id="winner-banner">
-    <div id="winner-title">🏆 1,000 GOALS!</div>
-    <div id="winner-sub">Next round starting in 6 seconds...</div>
+    <img id="winner-pfp" src="" alt="Winner">
+    <div id="winner-title">👑 LAST SURVIVOR!</div>
+    <div id="winner-sub"><span id="winner-name">Player</span> dominated the arena!</div>
   </div>
 
-  <!-- OFFLINE TESTING CONTROLS -->
+  <!-- Hidden Offline Test Controls -->
   <div id="test-panel">
-    <button class="btn-cr7" onclick="addGoals('ronaldo', 1, 'Tester')">+1 Rose (CR7)</button>
-    <button class="btn-cr7" onclick="addGoals('ronaldo', 10, 'Tester')">+10 CR7</button>
-    <button class="btn-lm10" onclick="addGoals('messi', 1, 'Tester')">+1 Logo (LM10)</button>
-    <button class="btn-lm10" onclick="addGoals('messi', 10, 'Tester')">+10 LM10</button>
-    <button style="background:#475569; color:#fff;" onclick="resetMatch()">Reset</button>
+    <button class="btn-spawn" onclick="testGift(1)">+1 Rose</button>
+    <button class="btn-spawn" onclick="testGift(30)">+30 Armor</button>
+    <button class="btn-heavy" onclick="testGift(100)">+100 Titan</button>
+    <button class="btn-heavy" onclick="testGift(1000)">+1000 Quake</button>
+    <button style="background:#475569; color:#fff;" onclick="resetRound()">Reset</button>
   </div>
 
   <script>
-    const START_RONALDO = 979;
-    const START_MESSI = 928;
-    const TARGET = 1000;
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
 
-    let cr7 = START_RONALDO;
-    let lm10 = START_MESSI;
-    let active = true;
+    const WIDTH = 1080;
+    const HEIGHT = 1920;
+    canvas.width = WIDTH;
+    canvas.height = HEIGHT;
 
-    function addGoals(player, amount, username, avatarUrl) {
-      if (!active) return;
+    const CENTER_X = WIDTH / 2;
+    const CENTER_Y = HEIGHT * 0.58;
 
-      if (player === 'ronaldo') {
-        cr7 = Math.min(TARGET, cr7 + amount);
-        updateUI('ronaldo');
-        spawnAlert('ronaldo', amount, username, avatarUrl);
-        if (cr7 >= TARGET) triggerWin('RONALDO');
+    // Arena Ring Bounds
+    const INITIAL_RADIUS = 460;
+    const MIN_RADIUS = 180;
+    let arenaRadius = INITIAL_RADIUS;
+
+    // Round State
+    let roundActive = true;
+    let roundTime = 90; // 90-second round
+    let totalSpawned = 0;
+    let screenShake = 0;
+
+    const players = [];
+    const particles = [];
+
+    // --- GAME ENGINE LOOP ---
+    function update() {
+      // Arena gradually shrinks
+      if (roundActive && arenaRadius > MIN_RADIUS) {
+        arenaRadius -= (INITIAL_RADIUS - MIN_RADIUS) / (90 * 60);
+      }
+
+      if (screenShake > 0.5) screenShake *= 0.9;
+
+      // Update Players
+      for (let i = players.length - 1; i >= 0; i--) {
+        const p = players[i];
+
+        if (p.falling) {
+          // Fall off into void
+          p.fallScale -= 0.035;
+          p.opacity -= 0.035;
+          p.x += p.vx * 0.5;
+          p.y += p.vy * 0.5;
+          if (p.opacity <= 0) {
+            players.splice(i, 1);
+            updateHUD();
+            checkVictory();
+            continue;
+          }
+        } else {
+          // Autonomous roaming steer (nudges players into action)
+          p.wanderAngle += (Math.random() - 0.5) * 0.3;
+          p.vx += Math.cos(p.wanderAngle) * 0.15;
+          p.vy += Math.sin(p.wanderAngle) * 0.15;
+
+          // Drag / Friction
+          p.vx *= 0.95;
+          p.vy *= 0.95;
+
+          p.x += p.vx;
+          p.y += p.vy;
+
+          // Check if pushed off arena edge
+          const distFromCenter = Math.hypot(p.x - CENTER_X, p.y - CENTER_Y);
+          if (distFromCenter > arenaRadius + p.radius * 0.4) {
+            p.falling = true;
+            // Radial push outward
+            const angle = Math.atan2(p.y - CENTER_Y, p.x - CENTER_X);
+            p.vx = Math.cos(angle) * 3;
+            p.vy = Math.sin(angle) * 3;
+            spawnSparks(p.x, p.y, p.color, 12);
+          }
+        }
+      }
+
+      // Resolve Ball-to-Ball Elastic Collisions
+      for (let i = 0; i < players.length; i++) {
+        for (let j = i + 1; j < players.length; j++) {
+          const p1 = players[i];
+          const p2 = players[j];
+          if (p1.falling || p2.falling) continue;
+
+          const dx = p2.x - p1.x;
+          const dy = p2.y - p1.y;
+          const dist = Math.hypot(dx, dy);
+          const minDist = p1.radius + p2.radius;
+
+          if (dist < minDist) {
+            // Collision normal
+            const nx = dx / (dist || 1);
+            const ny = dy / (dist || 1);
+
+            // Separate overlapping bodies
+            const overlap = (minDist - dist) * 0.5;
+            p1.x -= nx * overlap;
+            p1.y -= ny * overlap;
+            p2.x += nx * overlap;
+            p2.y += ny * overlap;
+
+            // Elastic bounce velocities
+            const kx = p1.vx - p2.vx;
+            const ky = p1.vy - p2.vy;
+            const p = 2 * (nx * kx + ny * ky) / (p1.mass + p2.mass);
+
+            let bonus1 = p1.isArmor ? 1.6 : 1.0;
+            let bonus2 = p2.isArmor ? 1.6 : 1.0;
+
+            p1.vx -= p * p2.mass * nx * bonus2;
+            p1.vy -= p * p2.mass * ny * bonus2;
+            p2.vx += p * p1.mass * nx * bonus1;
+            p2.vy += p * p1.mass * ny * bonus1;
+
+            spawnSparks((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, '#38bdf8', 6);
+          }
+        }
+      }
+
+      // Update particle effects
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const pt = particles[i];
+        pt.x += pt.vx;
+        pt.y += pt.vy;
+        pt.life -= 0.03;
+        if (pt.life <= 0) particles.splice(i, 1);
+      }
+
+      render();
+      requestAnimationFrame(update);
+    }
+
+    function render() {
+      ctx.save();
+      if (screenShake > 0.5) {
+        ctx.translate((Math.random() - 0.5) * screenShake, (Math.random() - 0.5) * screenShake);
+      }
+
+      ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+      // --- 1. ENDLESS VOID & BACKGROUND GRID ---
+      const bgGrad = ctx.createRadialGradient(CENTER_X, CENTER_Y, 100, CENTER_X, CENTER_Y, 900);
+      bgGrad.addColorStop(0, '#09132b');
+      bgGrad.addColorStop(1, '#03050c');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+      // --- 2. FLOATING ARENA ISLAND ---
+      // Outer drop shadow
+      ctx.save();
+      ctx.shadowBlur = 45;
+      ctx.shadowColor = 'rgba(56, 189, 248, 0.4)';
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(CENTER_X, CENTER_Y, arenaRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Platform Floor Texture Rings
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.2)';
+      ctx.beginPath();
+      ctx.arc(CENTER_X, CENTER_Y, arenaRadius * 0.7, 0, Math.PI * 2);
+      ctx.arc(CENTER_X, CENTER_Y, arenaRadius * 0.4, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Neon Warning Hazard Rim
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = '#38bdf8';
+      ctx.save();
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(CENTER_X, CENTER_Y, arenaRadius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+
+      // Danger Out-of-Bounds warning dash
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.6)';
+      ctx.setLineDash([14, 14]);
+      ctx.beginPath();
+      ctx.arc(CENTER_X, CENTER_Y, arenaRadius + 24, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // --- 3. PARTICLES ---
+      for (const pt of particles) {
+        ctx.save();
+        ctx.globalAlpha = pt.life;
+        ctx.fillStyle = pt.color;
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // --- 4. RENDER PLAYERS ---
+      for (const p of players) {
+        ctx.save();
+        ctx.globalAlpha = p.opacity;
+
+        const r = p.radius * p.fallScale;
+
+        // Player Outer Glow
+        ctx.save();
+        ctx.shadowBlur = p.isTitan ? 35 : (p.isArmor ? 25 : 15);
+        ctx.shadowColor = p.color;
+
+        // Body
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        ctx.restore();
+
+        // Avatar Image Texture
+        if (p.img && p.img.complete) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, r - 3, 0, Math.PI * 2);
+          ctx.clip();
+          ctx.drawImage(p.img, p.x - r, p.y - r, r * 2, r * 2);
+          ctx.restore();
+        }
+
+        // Armor Spike Ring
+        if (p.isArmor) {
+          ctx.lineWidth = 5;
+          ctx.strokeStyle = '#f59e0b';
+          ctx.setLineDash([8, 6]);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, r + 6, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
+        // Border Rim
+        ctx.lineWidth = p.isTitan ? 6 : 4;
+        ctx.strokeStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Player Name
+        if (!p.falling) {
+          ctx.fillStyle = '#ffffff';
+          ctx.font = `bold ${p.isTitan ? 20 : 15}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.shadowBlur = 6;
+          ctx.shadowColor = '#000';
+          ctx.fillText(p.name, p.x, p.y - r - 8);
+        }
+
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    // --- SPAWN / POWERUP LOGIC ---
+    function handleGift(username, avatarUrl, coins) {
+      if (!roundActive) return;
+
+      // Earthquake Mega Trigger
+      if (coins >= 1000) {
+        screenShake = 35;
+        spawnSparks(CENTER_X, CENTER_Y, '#f59e0b', 40);
+        // Blast all players outward
+        players.forEach(p => {
+          const angle = Math.atan2(p.y - CENTER_Y, p.x - CENTER_X);
+          p.vx += Math.cos(angle) * 18;
+          p.vy += Math.sin(angle) * 18;
+        });
+      }
+
+      // Check if player is already in the arena
+      let player = players.find(p => p.name === username && !p.falling);
+
+      if (player) {
+        // Upgrade / Boost Existing Player
+        if (coins >= 100) {
+          player.isTitan = true;
+          player.radius = 56;
+          player.mass = 4.0;
+          player.color = '#f59e0b';
+        } else if (coins >= 30) {
+          player.isArmor = true;
+          player.mass = 2.2;
+          player.color = '#38bdf8';
+        }
+
+        // Sudden forward dash towards nearest player
+        const target = players.find(other => other !== player && !other.falling);
+        if (target) {
+          const angle = Math.atan2(target.y - player.y, target.x - player.x);
+          player.vx += Math.cos(angle) * 16;
+          player.vy += Math.sin(angle) * 16;
+        }
+        spawnSparks(player.x, player.y, player.color, 15);
       } else {
-        lm10 = Math.min(TARGET, lm10 + amount);
-        updateUI('messi');
-        spawnAlert('messi', amount, username, avatarUrl);
-        if (lm10 >= TARGET) triggerWin('MESSI');
+        // Spawn New Player inside arena
+        const spawnAngle = Math.random() * Math.PI * 2;
+        const spawnDist = Math.random() * (arenaRadius * 0.65);
+        const x = CENTER_X + Math.cos(spawnAngle) * spawnDist;
+        const y = CENTER_Y + Math.sin(spawnAngle) * spawnDist;
+
+        const isTitan = coins >= 100;
+        const isArmor = coins >= 30 && !isTitan;
+
+        const newP = {
+          name: username,
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.5) * 4,
+          radius: isTitan ? 56 : 34,
+          mass: isTitan ? 4.0 : (isArmor ? 2.2 : 1.0),
+          isTitan: isTitan,
+          isArmor: isArmor,
+          color: isTitan ? '#f59e0b' : (isArmor ? '#38bdf8' : '#ec4899'),
+          wanderAngle: Math.random() * Math.PI * 2,
+          falling: false,
+          fallScale: 1.0,
+          opacity: 1.0,
+          img: null
+        };
+
+        if (avatarUrl) {
+          newP.img = new Image();
+          newP.img.src = avatarUrl;
+        }
+
+        players.push(newP);
+        totalSpawned++;
+        spawnSparks(x, y, newP.color, 20);
+        updateHUD();
       }
     }
 
-    function updateUI(player) {
-      if (player === 'ronaldo') {
-        document.getElementById('ronaldo-score-text').innerText = `${cr7}/${TARGET}`;
-        const pct = ((cr7 / TARGET) * 100).toFixed(1);
-        document.getElementById('ronaldo-pct-text').innerText = `${pct}%`;
-        document.getElementById('ronaldo-bar').style.width = `${pct}%`;
-      } else {
-        document.getElementById('messi-score-text').innerText = `${lm10}/${TARGET}`;
-        const pct = ((lm10 / TARGET) * 100).toFixed(1);
-        document.getElementById('messi-pct-text').innerText = `${pct}%`;
-        document.getElementById('messi-bar').style.width = `${pct}%`;
+    function spawnSparks(x, y, color, count) {
+      for (let i = 0; i < count; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const spd = 2 + Math.random() * 6;
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd,
+          size: 2 + Math.random() * 3,
+          color: color,
+          life: 1.0
+        });
       }
     }
 
-    function spawnAlert(player, amount, username, avatarUrl) {
-      const container = document.getElementById(player === 'ronaldo' ? 'ronaldo-half' : 'messi-half');
-      const popup = document.createElement('div');
-      popup.className = `goal-popup ${player === 'ronaldo' ? 'popup-cr7' : 'popup-lm10'}`;
-
-      const avatar = avatarUrl ? `<img src="${avatarUrl}">` : '⚽';
-      popup.innerHTML = `${avatar} <span>${username} +${amount} GOAL${amount > 1 ? 'S' : ''}!</span>`;
-
-      popup.style.left = `${30 + Math.random() * 30}%`;
-      popup.style.top = `${35 + Math.random() * 25}%`;
-
-      container.appendChild(popup);
-      setTimeout(() => popup.remove(), 1800);
+    function updateHUD() {
+      const activeSurvivors = players.filter(p => !p.falling).length;
+      document.getElementById('survivors-count').innerText = activeSurvivors;
+      document.getElementById('total-spawns').innerText = totalSpawned;
     }
 
-    function triggerWin(winner) {
-      active = false;
+    function checkVictory() {
+      if (!roundActive) return;
+      const alive = players.filter(p => !p.falling);
+      if (totalSpawned >= 2 && alive.length === 1) {
+        endRound(alive[0]);
+      }
+    }
+
+    function endRound(winner) {
+      roundActive = false;
       const banner = document.getElementById('winner-banner');
-      const title = document.getElementById('winner-title');
-
-      if (winner === 'RONALDO') {
-        title.innerHTML = '🇵🇹 CRISTIANO RONALDO REACHED 1,000 GOALS! SIUUU! 🐐';
-        title.style.color = '#ffe600';
-        banner.style.borderColor = '#ffe600';
-      } else {
-        title.innerHTML = '🇦🇷 LIONEL MESSI REACHED 1,000 GOALS! ANKARA MESSI! 🐐';
-        title.style.color = '#f472b6';
-        banner.style.borderColor = '#f472b6';
-      }
+      document.getElementById('winner-name').innerText = winner.name;
+      const pfp = document.getElementById('winner-pfp');
+      if (winner.img) pfp.src = winner.img.src;
+      else pfp.src = 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
 
       banner.style.transform = 'translate(-50%, -50%) scale(1)';
 
       setTimeout(() => {
-        resetMatch();
+        resetRound();
       }, 6000);
     }
 
-    function resetMatch() {
+    function resetRound() {
       const banner = document.getElementById('winner-banner');
       banner.style.transform = 'translate(-50%, -50%) scale(0)';
-      cr7 = START_RONALDO;
-      lm10 = START_MESSI;
-      updateUI('ronaldo');
-      updateUI('messi');
-      active = true;
+      players.length = 0;
+      particles.length = 0;
+      arenaRadius = INITIAL_RADIUS;
+      roundTime = 90;
+      totalSpawned = 0;
+      updateHUD();
+      roundActive = true;
     }
 
+    // --- COUNTDOWN TIMER ---
+    setInterval(() => {
+      if (!roundActive) return;
+      if (roundTime > 0) {
+        roundTime--;
+        const m = String(Math.floor(roundTime / 60)).padStart(2, '0');
+        const s = String(roundTime % 60).padStart(2, '0');
+        document.getElementById('timer-val').innerText = `${m}:${s}`;
+      } else {
+        // Time expired: crown biggest/closest survivor
+        const alive = players.filter(p => !p.falling);
+        if (alive.length > 0) endRound(alive[0]);
+        else resetRound();
+      }
+    }, 1000);
+
+    // Testing Controls
     window.toggleTestPanel = function() {
       const p = document.getElementById('test-panel');
       p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
+    };
+
+    window.testGift = function(coins) {
+      const botNames = ['Alex', 'Leo', 'Speed', 'Zack', 'Viper', 'Ghost'];
+      const randomName = botNames[Math.floor(Math.random() * botNames.length)];
+      handleGift(randomName, null, coins);
     };
 
     // --- WEBSOCKET LISTENER ---
@@ -569,16 +617,11 @@
     socket.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
       if (data.type === 'GIFT') {
-        const gift = (data.giftName || '').toLowerCase();
-        const coins = data.diamondCount || 1;
-        const player = gift.includes('rose') ? 'ronaldo' : 'messi';
-
-        let added = coins;
-        if (coins >= 1000) added = 1000;
-
-        addGoals(player, added, data.username, data.avatar);
+        handleGift(data.username, data.avatar, data.diamondCount || 1);
       }
     };
+
+    update();
   </script>
 </body>
 </html>
