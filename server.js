@@ -5,7 +5,7 @@ const express = require('express');
 const WebSocket = require('ws');
 const { WebcastPushConnection } = require('tiktok-live-connector');
 
-const TIKTOK_USERNAME = 'mgmatty_onfire';
+const TIKTOK_USERNAME = 'mgmatty_onfire'; // Your TikTok username
 const PORT = process.env.PORT || 3000;
 const AVATAR_DIR = path.join(__dirname, 'public', 'avatars');
 
@@ -77,6 +77,7 @@ tiktokLive.on('gift', async (data) => {
     type: 'GIFT',
     username: data.nickname || data.uniqueId,
     avatar: localAvatar,
+    giftName: data.giftName || 'Gift',
     diamondCount: data.diamondCount * (data.repeatCount || 1)
   });
 });
@@ -84,4 +85,3 @@ tiktokLive.on('gift', async (data) => {
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-                                       
