@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Avatar Bumper Arena - Sumo Battle Royale</title>
+  <title>Feed the Chonky Cat Live</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #050711;
+      background: #1e1b4b;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       user-select: none;
@@ -17,52 +17,73 @@
 
     /* Secret tap area at top of screen to toggle testing buttons */
     #secret-tap-zone {
-      position: absolute; top: 0; left: 0; width: 100%; height: 60px; z-index: 100;
+      position: absolute; top: 0; left: 0; width: 100%; height: 50px; z-index: 100;
     }
 
     #game-canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     }
 
-    /* --- TOP LIVE HUD --- */
+    /* --- TOP PROGRESS & STATS HUD --- */
     #top-hud {
       position: absolute; top: 16px; left: 0; width: 100%;
-      display: flex; justify-content: space-between; align-items: flex-start;
-      padding: 0 16px; z-index: 50; pointer-events: none;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 8px; z-index: 50; pointer-events: none; padding: 0 16px;
     }
 
-    .hud-card {
-      background: rgba(15, 23, 42, 0.9);
-      border: 2px solid rgba(56, 189, 248, 0.4);
-      border-radius: 16px;
-      padding: 8px 14px;
-      text-align: center;
-      color: white;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+    .level-badge {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      padding: 4px 16px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5);
+      border: 2px solid #fef3c7;
     }
-    .hud-label { font-size: 10px; font-weight: 800; color: #94a3b8; letter-spacing: 1px; }
-    .hud-val { font-size: 22px; font-weight: 900; color: #38bdf8; }
 
-    #timer-val { color: #f59e0b; }
+    /* Chonk Progress Bar */
+    .bar-container {
+      width: 90%;
+      height: 24px;
+      background: rgba(15, 23, 42, 0.85);
+      border-radius: 14px;
+      border: 2.5px solid #f472b6;
+      box-shadow: 0 0 16px rgba(244, 114, 182, 0.4);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bar-fill {
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 15%;
+      background: linear-gradient(90deg, #ec4899, #f472b6);
+      border-radius: 10px;
+      transition: width 0.3s ease-out;
+    }
+    .bar-text {
+      position: relative; z-index: 2;
+      font-size: 12px; font-weight: 900; color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      letter-spacing: 0.5px;
+    }
 
-    /* --- SIDE GIFT RULES (CLEAN FLOATING CHIPS) --- */
-    #gift-rules-left {
-      position: absolute; top: 90px; left: 14px;
+    /* --- SIDEBAR GIFT MENUS --- */
+    #rules-left {
+      position: absolute; top: 90px; left: 12px;
       display: flex; flex-direction: column; gap: 8px; z-index: 50; pointer-events: none;
     }
-    #gift-rules-right {
-      position: absolute; top: 90px; right: 14px;
+    #rules-right {
+      position: absolute; top: 90px; right: 12px;
       display: flex; flex-direction: column; gap: 8px; z-index: 50; pointer-events: none;
     }
 
-    .rule-chip {
-      background: rgba(11, 15, 30, 0.92);
-      border-radius: 12px;
+    .gift-chip {
+      background: rgba(15, 23, 42, 0.92);
+      border-radius: 14px;
       padding: 6px 10px;
       display: flex;
       align-items: center;
@@ -72,117 +93,128 @@
       backdrop-filter: blur(6px);
       border: 2px solid;
     }
-    .chip-cyan { border-color: #38bdf8; box-shadow: 0 0 12px rgba(56, 189, 248, 0.35); }
+    .chip-pink { border-color: #f472b6; box-shadow: 0 0 12px rgba(244, 114, 182, 0.35); }
     .chip-gold { border-color: #f59e0b; box-shadow: 0 0 12px rgba(245, 158, 11, 0.35); }
 
-    .chip-emoji { font-size: 24px; line-height: 1; }
+    .chip-icon { font-size: 26px; line-height: 1; }
     .chip-name { font-size: 11px; font-weight: 800; color: #cbd5e1; }
-    .chip-action { font-size: 13px; font-weight: 900; }
-    .txt-cyan { color: #38bdf8; }
-    .txt-gold { color: #f59e0b; }
+    .chip-action { font-size: 12px; font-weight: 900; }
+    .text-pink { color: #f472b6; }
+    .text-gold { color: #f59e0b; }
 
-    /* --- VICTORY BANNER --- */
-    #winner-banner {
+    /* Top Feeder Card */
+    #leaderboard-box {
+      position: absolute; bottom: 20px; right: 16px;
+      background: rgba(15, 23, 42, 0.92); border: 2px solid #f59e0b;
+      border-radius: 14px; padding: 8px 12px; color: white;
+      z-index: 50; pointer-events: none; box-shadow: 0 4px 18px rgba(0,0,0,0.8);
+      display: flex; align-items: center; gap: 8px;
+    }
+    #top-feeder-img {
+      width: 32px; height: 32px; border-radius: 50%; border: 2px solid #f59e0b;
+      object-fit: cover;
+    }
+    .feeder-title { font-size: 9px; font-weight: 800; color: #f59e0b; letter-spacing: 0.5px; }
+    .feeder-name { font-size: 12px; font-weight: 900; }
+
+    /* Level Up Celebration Banner */
+    #celebrate-banner {
       position: absolute; top: 46%; left: 50%; transform: translate(-50%, -50%) scale(0);
-      background: rgba(11, 15, 30, 0.98); padding: 30px; border-radius: 28px;
+      background: rgba(15, 23, 42, 0.98); padding: 28px 24px; border-radius: 28px;
       text-align: center; color: white; z-index: 200;
-      box-shadow: 0 0 60px rgba(0, 0, 0, 0.95);
+      box-shadow: 0 0 60px rgba(245, 158, 11, 0.8);
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       border: 4px solid #f59e0b; width: 88%;
     }
-    #winner-pfp {
-      width: 90px; height: 90px; border-radius: 50%; border: 4px solid #f59e0b;
-      margin-bottom: 10px; box-shadow: 0 0 24px rgba(245, 158, 11, 0.8);
-      object-fit: cover;
-    }
-    #winner-title { font-size: 28px; font-weight: 900; margin-bottom: 6px; color: #f59e0b; }
-    #winner-sub { font-size: 15px; color: #cbd5e1; }
+    #celebrate-title { font-size: 30px; font-weight: 900; color: #f59e0b; margin-bottom: 6px; }
+    #celebrate-sub { font-size: 16px; color: #cbd5e1; }
 
-    /* --- HIDDEN TESTING CONTROLS --- */
+    /* Testing controls */
     #test-panel {
-      position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
-      display: none; gap: 8px; background: rgba(0,0,0,0.9); padding: 8px 12px;
+      position: absolute; bottom: 20px; left: 16px;
+      display: none; gap: 6px; background: rgba(0,0,0,0.9); padding: 8px 10px;
       border-radius: 12px; z-index: 150;
     }
     button {
-      border: none; padding: 7px 11px; border-radius: 6px;
+      border: none; padding: 6px 10px; border-radius: 6px;
       font-weight: 900; cursor: pointer; font-size: 11px;
     }
-    .btn-spawn { background: #38bdf8; color: #000; }
-    .btn-heavy { background: #f59e0b; color: #000; }
+    .btn-snack { background: #f472b6; color: #000; }
+    .btn-feast { background: #f59e0b; color: #000; }
   </style>
 </head>
 <body>
   <div id="secret-tap-zone" onclick="toggleTestPanel()"></div>
 
-  <!-- HUD -->
+  <!-- Top HUD -->
   <div id="top-hud">
-    <div class="hud-card">
-      <div class="hud-label">SURVIVORS</div>
-      <div class="hud-val" id="survivors-count">0</div>
-    </div>
-    <div class="hud-card">
-      <div class="hud-label">SHRINKING RING</div>
-      <div class="hud-val" id="timer-val">01:30</div>
-    </div>
-    <div class="hud-card">
-      <div class="hud-label">TOTAL SPAWNS</div>
-      <div class="hud-val" id="total-spawns">0</div>
+    <div class="level-badge" id="cat-level-badge">🐱 LEVEL 1: CUTE CHONK</div>
+    <div class="bar-container">
+      <div class="bar-fill" id="food-bar" style="width: 15%;"></div>
+      <div class="bar-text" id="food-bar-text">30 / 200 TREATS (15%)</div>
     </div>
   </div>
 
   <!-- Left Gift Rules -->
-  <div id="gift-rules-left">
-    <div class="rule-chip chip-cyan">
-      <span class="chip-emoji">🌹</span>
+  <div id="rules-left">
+    <div class="gift-chip chip-pink">
+      <span class="chip-icon">🐟</span>
       <div>
         <div class="chip-name">1 Rose</div>
-        <div class="chip-action txt-cyan">SPAWN / DASH</div>
+        <div class="chip-action text-pink">+1 FISH</div>
       </div>
     </div>
-    <div class="rule-chip chip-cyan">
-      <span class="chip-emoji">🍩</span>
+    <div class="gift-chip chip-pink">
+      <span class="chip-icon">🥛</span>
       <div>
-        <div class="chip-name">30 Coins</div>
-        <div class="chip-action txt-cyan">ARMOR SHIELD</div>
+        <div class="chip-name">TikTok Logo</div>
+        <div class="chip-action text-pink">+10 MILK</div>
       </div>
     </div>
   </div>
 
   <!-- Right Gift Rules -->
-  <div id="gift-rules-right">
-    <div class="rule-chip chip-gold">
-      <span class="chip-emoji">🎉</span>
+  <div id="rules-right">
+    <div class="gift-chip chip-gold">
+      <span class="chip-icon">🥫</span>
       <div>
-        <div class="chip-name">100 Coins</div>
-        <div class="chip-action txt-gold">SUMO TITAN</div>
+        <div class="chip-name">30 Coins</div>
+        <div class="chip-action text-gold">+30 TUNA</div>
       </div>
     </div>
-    <div class="rule-chip chip-gold">
-      <span class="chip-emoji">🦁</span>
+    <div class="gift-chip chip-gold">
+      <span class="chip-icon">🍗</span>
       <div>
-        <div class="chip-name">1000 Coins</div>
-        <div class="chip-action txt-gold">EARTHQUAKE</div>
+        <div class="chip-name">100 Coins</div>
+        <div class="chip-action text-gold">+100 FEAST</div>
       </div>
+    </div>
+  </div>
+
+  <!-- Top Feeder Badge -->
+  <div id="leaderboard-box">
+    <img id="top-feeder-img" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png">
+    <div>
+      <div class="feeder-title">🏆 TOP FEEDER</div>
+      <div class="feeder-name" id="top-feeder-name">Waiting for treats...</div>
     </div>
   </div>
 
   <canvas id="game-canvas"></canvas>
 
-  <!-- Winner Banner -->
-  <div id="winner-banner">
-    <img id="winner-pfp" src="" alt="Winner">
-    <div id="winner-title">👑 LAST SURVIVOR!</div>
-    <div id="winner-sub"><span id="winner-name">Player</span> dominated the arena!</div>
+  <!-- Level Up Banner -->
+  <div id="celebrate-banner">
+    <div id="celebrate-title">🎉 ULTRA CHONK REACHED!</div>
+    <div id="celebrate-sub">Cat evolved to the next level of chonkiness!</div>
   </div>
 
-  <!-- Hidden Offline Test Controls -->
+  <!-- Testing Panel -->
   <div id="test-panel">
-    <button class="btn-spawn" onclick="testGift(1)">+1 Rose</button>
-    <button class="btn-spawn" onclick="testGift(30)">+30 Armor</button>
-    <button class="btn-heavy" onclick="testGift(100)">+100 Titan</button>
-    <button class="btn-heavy" onclick="testGift(1000)">+1000 Quake</button>
-    <button style="background:#475569; color:#fff;" onclick="resetRound()">Reset</button>
+    <button class="btn-snack" onclick="testTreat(1)">+1 Fish</button>
+    <button class="btn-snack" onclick="testTreat(10)">+10 Milk</button>
+    <button class="btn-feast" onclick="testTreat(30)">+30 Tuna</button>
+    <button class="btn-feast" onclick="testTreat(100)">+100 Feast</button>
+    <button style="background:#475569; color:#fff;" onclick="resetChonk()">Reset</button>
   </div>
 
   <script>
@@ -194,122 +226,76 @@
     canvas.width = WIDTH;
     canvas.height = HEIGHT;
 
-    const CENTER_X = WIDTH / 2;
-    const CENTER_Y = HEIGHT * 0.58;
+    // Cat Position & Geometry
+    const CAT_X = WIDTH / 2;
+    const CAT_Y = HEIGHT * 0.65;
+    const BOWL_Y = CAT_Y + 180;
 
-    // Arena Ring Bounds
-    const INITIAL_RADIUS = 460;
-    const MIN_RADIUS = 180;
-    let arenaRadius = INITIAL_RADIUS;
+    // Chonk Progression
+    let currentTreats = 30;
+    let maxTreats = 200;
+    let chonkLevel = 1;
+    let catScale = 1.0; // Grows as cat eats!
 
-    // Round State
-    let roundActive = true;
-    let roundTime = 90; // 90-second round
-    let totalSpawned = 0;
-    let screenShake = 0;
+    // Animation Timers
+    let animFrame = 0;
+    let mouthOpen = 0; // 0 (closed) to 1 (wide open nom nom)
+    let chewTimer = 0;
+    let blinkTimer = 0;
+    let tailAngle = 0;
 
-    const players = [];
+    const foods = [];
     const particles = [];
+    const feederScores = {};
 
     // --- GAME ENGINE LOOP ---
     function update() {
-      // Arena gradually shrinks
-      if (roundActive && arenaRadius > MIN_RADIUS) {
-        arenaRadius -= (INITIAL_RADIUS - MIN_RADIUS) / (90 * 60);
+      animFrame++;
+
+      // Natural Tail Wag
+      tailAngle = Math.sin(animFrame * 0.05) * 0.35;
+
+      // Natural Blinking
+      if (blinkTimer > 0) blinkTimer--;
+      else if (Math.random() < 0.015) blinkTimer = 12;
+
+      // Chewing Decay
+      if (chewTimer > 0) {
+        chewTimer--;
+        mouthOpen = Math.abs(Math.sin(animFrame * 0.35));
+      } else {
+        mouthOpen = 0;
       }
 
-      if (screenShake > 0.5) screenShake *= 0.9;
+      // Smooth chonk scale based on treat progress
+      const targetScale = 1.0 + (currentTreats / maxTreats) * 0.45;
+      catScale += (targetScale - catScale) * 0.05;
 
-      // Update Players
-      for (let i = players.length - 1; i >= 0; i--) {
-        const p = players[i];
+      // Update Dropping Food Items
+      for (let i = foods.length - 1; i >= 0; i--) {
+        const f = foods[i];
+        f.vy += 0.45; // Gravity
+        f.x += f.vx;
+        f.y += f.vy;
 
-        if (p.falling) {
-          // Fall off into void
-          p.fallScale -= 0.035;
-          p.opacity -= 0.035;
-          p.x += p.vx * 0.5;
-          p.y += p.vy * 0.5;
-          if (p.opacity <= 0) {
-            players.splice(i, 1);
-            updateHUD();
-            checkVictory();
-            continue;
-          }
-        } else {
-          // Autonomous roaming steer (nudges players into action)
-          p.wanderAngle += (Math.random() - 0.5) * 0.3;
-          p.vx += Math.cos(p.wanderAngle) * 0.15;
-          p.vy += Math.sin(p.wanderAngle) * 0.15;
+        // Cat looks up eagerly and opens mouth when food gets close
+        if (f.y > CAT_Y - 260 && f.y < BOWL_Y) {
+          mouthOpen = Math.max(mouthOpen, 0.75);
+        }
 
-          // Drag / Friction
-          p.vx *= 0.95;
-          p.vy *= 0.95;
-
-          p.x += p.vx;
-          p.y += p.vy;
-
-          // Check if pushed off arena edge
-          const distFromCenter = Math.hypot(p.x - CENTER_X, p.y - CENTER_Y);
-          if (distFromCenter > arenaRadius + p.radius * 0.4) {
-            p.falling = true;
-            // Radial push outward
-            const angle = Math.atan2(p.y - CENTER_Y, p.x - CENTER_X);
-            p.vx = Math.cos(angle) * 3;
-            p.vy = Math.sin(angle) * 3;
-            spawnSparks(p.x, p.y, p.color, 12);
-          }
+        // Food lands in the cat's mouth / bowl!
+        if (f.y >= BOWL_Y - 20) {
+          eatFood(f);
+          foods.splice(i, 1);
         }
       }
 
-      // Resolve Ball-to-Ball Elastic Collisions
-      for (let i = 0; i < players.length; i++) {
-        for (let j = i + 1; j < players.length; j++) {
-          const p1 = players[i];
-          const p2 = players[j];
-          if (p1.falling || p2.falling) continue;
-
-          const dx = p2.x - p1.x;
-          const dy = p2.y - p1.y;
-          const dist = Math.hypot(dx, dy);
-          const minDist = p1.radius + p2.radius;
-
-          if (dist < minDist) {
-            // Collision normal
-            const nx = dx / (dist || 1);
-            const ny = dy / (dist || 1);
-
-            // Separate overlapping bodies
-            const overlap = (minDist - dist) * 0.5;
-            p1.x -= nx * overlap;
-            p1.y -= ny * overlap;
-            p2.x += nx * overlap;
-            p2.y += ny * overlap;
-
-            // Elastic bounce velocities
-            const kx = p1.vx - p2.vx;
-            const ky = p1.vy - p2.vy;
-            const p = 2 * (nx * kx + ny * ky) / (p1.mass + p2.mass);
-
-            let bonus1 = p1.isArmor ? 1.6 : 1.0;
-            let bonus2 = p2.isArmor ? 1.6 : 1.0;
-
-            p1.vx -= p * p2.mass * nx * bonus2;
-            p1.vy -= p * p2.mass * ny * bonus2;
-            p2.vx += p * p1.mass * nx * bonus1;
-            p2.vy += p * p1.mass * ny * bonus1;
-
-            spawnSparks((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, '#38bdf8', 6);
-          }
-        }
-      }
-
-      // Update particle effects
+      // Floating nom nom hearts & particles
       for (let i = particles.length - 1; i >= 0; i--) {
         const pt = particles[i];
         pt.x += pt.vx;
         pt.y += pt.vy;
-        pt.life -= 0.03;
+        pt.life -= 0.02;
         if (pt.life <= 0) particles.splice(i, 1);
       }
 
@@ -318,285 +304,435 @@
     }
 
     function render() {
-      ctx.save();
-      if (screenShake > 0.5) {
-        ctx.translate((Math.random() - 0.5) * screenShake, (Math.random() - 0.5) * screenShake);
-      }
-
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-      // --- 1. ENDLESS VOID & BACKGROUND GRID ---
-      const bgGrad = ctx.createRadialGradient(CENTER_X, CENTER_Y, 100, CENTER_X, CENTER_Y, 900);
-      bgGrad.addColorStop(0, '#09132b');
-      bgGrad.addColorStop(1, '#03050c');
-      ctx.fillStyle = bgGrad;
+      // --- 1. COZY AMBIENT ROOM BACKGROUND ---
+      const bg = ctx.createRadialGradient(CAT_X, CAT_Y - 100, 80, CAT_X, CAT_Y, 800);
+      bg.addColorStop(0, '#2e1065');
+      bg.addColorStop(1, '#0f0b24');
+      ctx.fillStyle = bg;
       ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-      // --- 2. FLOATING ARENA ISLAND ---
-      // Outer drop shadow
+      // Warm rug under the cat
       ctx.save();
-      ctx.shadowBlur = 45;
-      ctx.shadowColor = 'rgba(56, 189, 248, 0.4)';
-      ctx.fillStyle = '#0f172a';
+      ctx.shadowBlur = 30;
+      ctx.shadowColor = 'rgba(244, 114, 182, 0.25)';
+      ctx.fillStyle = '#4c1d95';
       ctx.beginPath();
-      ctx.arc(CENTER_X, CENTER_Y, arenaRadius, 0, Math.PI * 2);
+      ctx.ellipse(CAT_X, BOWL_Y + 40, 360 * catScale, 90, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
 
-      // Platform Floor Texture Rings
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.2)';
-      ctx.beginPath();
-      ctx.arc(CENTER_X, CENTER_Y, arenaRadius * 0.7, 0, Math.PI * 2);
-      ctx.arc(CENTER_X, CENTER_Y, arenaRadius * 0.4, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Neon Warning Hazard Rim
-      ctx.lineWidth = 10;
-      ctx.strokeStyle = '#38bdf8';
-      ctx.save();
-      ctx.shadowBlur = 20;
-      ctx.shadowColor = '#38bdf8';
-      ctx.beginPath();
-      ctx.arc(CENTER_X, CENTER_Y, arenaRadius, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-
-      // Danger Out-of-Bounds warning dash
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = 'rgba(239, 68, 68, 0.6)';
-      ctx.setLineDash([14, 14]);
-      ctx.beginPath();
-      ctx.arc(CENTER_X, CENTER_Y, arenaRadius + 24, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // --- 3. PARTICLES ---
+      // --- 2. PARTICLES & FLOATING HEARTS ---
       for (const pt of particles) {
         ctx.save();
         ctx.globalAlpha = pt.life;
-        ctx.fillStyle = pt.color;
-        ctx.beginPath();
-        ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
-        ctx.fill();
+        if (pt.isHeart) {
+          ctx.font = `${pt.size}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillText(pt.char, pt.x, pt.y);
+        } else {
+          ctx.fillStyle = pt.color;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
         ctx.restore();
       }
 
-      // --- 4. RENDER PLAYERS ---
-      for (const p of players) {
+      // --- 3. DRAW THE ANIMATED CHONKY CAT ---
+      drawAnimatedCat();
+
+      // --- 4. DRAW FOOD BOWL ---
+      drawBowl();
+
+      // --- 5. DRAW FALLING FOOD WITH SENDER AVATARS ---
+      for (const f of foods) {
         ctx.save();
-        ctx.globalAlpha = p.opacity;
+        ctx.translate(f.x, f.y);
+        ctx.rotate(f.rot);
 
-        const r = p.radius * p.fallScale;
+        // Food Shadow
+        ctx.shadowBlur = 18;
+        ctx.shadowColor = '#f472b6';
 
-        // Player Outer Glow
-        ctx.save();
-        ctx.shadowBlur = p.isTitan ? 35 : (p.isArmor ? 25 : 15);
-        ctx.shadowColor = p.color;
+        // Food Emoji / Icon Base
+        ctx.font = '54px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(f.emoji, 0, 0);
 
-        // Body
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
-        ctx.restore();
-
-        // Avatar Image Texture
-        if (p.img && p.img.complete) {
+        // Stamp Sender Avatar on top corner of the food
+        if (f.img && f.img.complete) {
           ctx.save();
           ctx.beginPath();
-          ctx.arc(p.x, p.y, r - 3, 0, Math.PI * 2);
+          ctx.arc(20, -18, 18, 0, Math.PI * 2);
           ctx.clip();
-          ctx.drawImage(p.img, p.x - r, p.y - r, r * 2, r * 2);
+          ctx.drawImage(f.img, 2, -36, 36, 36);
           ctx.restore();
-        }
 
-        // Armor Spike Ring
-        if (p.isArmor) {
-          ctx.lineWidth = 5;
+          ctx.lineWidth = 2.5;
           ctx.strokeStyle = '#f59e0b';
-          ctx.setLineDash([8, 6]);
           ctx.beginPath();
-          ctx.arc(p.x, p.y, r + 6, 0, Math.PI * 2);
+          ctx.arc(20, -18, 18, 0, Math.PI * 2);
           ctx.stroke();
-          ctx.setLineDash([]);
         }
 
-        // Border Rim
-        ctx.lineWidth = p.isTitan ? 6 : 4;
-        ctx.strokeStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-        ctx.stroke();
-
-        // Player Name
-        if (!p.falling) {
-          ctx.fillStyle = '#ffffff';
-          ctx.font = `bold ${p.isTitan ? 20 : 15}px sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.shadowBlur = 6;
-          ctx.shadowColor = '#000';
-          ctx.fillText(p.name, p.x, p.y - r - 8);
-        }
+        // Sender Name tag
+        ctx.font = 'bold 16px sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowBlur = 6;
+        ctx.shadowColor = '#000';
+        ctx.fillText(f.username, 0, 38);
 
         ctx.restore();
       }
+    }
+
+    // --- PROCEDURAL CUTE CHONK CAT ---
+    function drawAnimatedCat() {
+      ctx.save();
+      ctx.translate(CAT_X, CAT_Y);
+      ctx.scale(catScale, catScale);
+
+      // Tail
+      ctx.save();
+      ctx.translate(-110, 80);
+      ctx.rotate(tailAngle);
+      ctx.lineWidth = 32;
+      ctx.strokeStyle = '#f97316';
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.quadraticCurveTo(-70, -60, -90, -120);
+      ctx.stroke();
+      ctx.restore();
+
+      // Chonky Round Body
+      ctx.save();
+      ctx.shadowBlur = 25;
+      ctx.shadowColor = 'rgba(249, 115, 22, 0.4)';
+      ctx.fillStyle = '#fb923c'; // Vibrant Orange Cat
+      ctx.beginPath();
+      ctx.ellipse(0, 50, 160, 130, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // White Belly Patch
+      ctx.fillStyle = '#ffedd5';
+      ctx.beginPath();
+      ctx.ellipse(0, 70, 105, 95, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ears
+      // Left Ear
+      ctx.fillStyle = '#ea580c';
+      ctx.beginPath();
+      ctx.moveTo(-110, -110);
+      ctx.lineTo(-60, -190);
+      ctx.lineTo(-20, -120);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#f472b6'; // Pink inside
+      ctx.beginPath();
+      ctx.moveTo(-95, -115);
+      ctx.lineTo(-60, -170);
+      ctx.lineTo(-35, -125);
+      ctx.closePath();
+      ctx.fill();
+
+      // Right Ear
+      ctx.fillStyle = '#ea580c';
+      ctx.beginPath();
+      ctx.moveTo(110, -110);
+      ctx.lineTo(60, -190);
+      ctx.lineTo(20, -120);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#f472b6';
+      ctx.beginPath();
+      ctx.moveTo(95, -115);
+      ctx.lineTo(60, -170);
+      ctx.lineTo(35, -125);
+      ctx.closePath();
+      ctx.fill();
+
+      // Round Head
+      ctx.fillStyle = '#fb923c';
+      ctx.beginPath();
+      ctx.arc(0, -65, 120, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Chubby Cheeks
+      ctx.fillStyle = '#fdba74';
+      ctx.beginPath();
+      ctx.arc(-70, -40, 48, 0, Math.PI * 2);
+      ctx.arc(70, -40, 48, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eyes
+      if (blinkTimer > 0) {
+        // Happy closed eyes ^ ^
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = '#1e1b4b';
+        ctx.beginPath();
+        ctx.arc(-45, -80, 20, Math.PI, 0);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(45, -80, 20, Math.PI, 0);
+        ctx.stroke();
+      } else {
+        // Big sparkling kawaii eyes
+        ctx.fillStyle = '#1e1b4b';
+        ctx.beginPath();
+        ctx.arc(-45, -80, 22, 0, Math.PI * 2);
+        ctx.arc(45, -80, 22, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eye highlights
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(-40, -86, 7, 0, Math.PI * 2);
+        ctx.arc(50, -86, 7, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Pink Nose
+      ctx.fillStyle = '#f43f5e';
+      ctx.beginPath();
+      ctx.moveTo(-10, -45);
+      ctx.lineTo(10, -45);
+      ctx.lineTo(0, -35);
+      ctx.closePath();
+      ctx.fill();
+
+      // Animated Mouth (Opens when food drops!)
+      if (mouthOpen > 0.1) {
+        ctx.fillStyle = '#be123c';
+        ctx.beginPath();
+        ctx.ellipse(0, -22, 22 * mouthOpen, 28 * mouthOpen, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cute Little Tongue
+        ctx.fillStyle = '#fb7185';
+        ctx.beginPath();
+        ctx.arc(0, -14, 12 * mouthOpen, 0, Math.PI);
+        ctx.fill();
+      } else {
+        // Closed w mouth :3
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#1e1b4b';
+        ctx.beginPath();
+        ctx.arc(-14, -32, 14, 0.1, Math.PI * 0.9);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(14, -32, 14, 0.1, Math.PI * 0.9);
+        ctx.stroke();
+      }
+
+      // Whiskers
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#7c2d12';
+      // Left Whiskers
+      ctx.beginPath();
+      ctx.moveTo(-75, -45); ctx.lineTo(-135, -55);
+      ctx.moveTo(-75, -35); ctx.lineTo(-140, -35);
+      ctx.moveTo(-75, -25); ctx.lineTo(-130, -15);
+      // Right Whiskers
+      ctx.moveTo(75, -45); ctx.lineTo(135, -55);
+      ctx.moveTo(75, -35); ctx.lineTo(140, -35);
+      ctx.moveTo(75, -25); ctx.lineTo(130, -15);
+      ctx.stroke();
+
+      // Front Paws
+      ctx.fillStyle = '#ffedd5';
+      ctx.beginPath();
+      ctx.arc(-55, 140, 32, 0, Math.PI * 2);
+      ctx.arc(55, 140, 32, 0, Math.PI * 2);
+      ctx.fill();
 
       ctx.restore();
     }
 
-    // --- SPAWN / POWERUP LOGIC ---
-    function handleGift(username, avatarUrl, coins) {
-      if (!roundActive) return;
+    function drawBowl() {
+      ctx.save();
+      ctx.shadowBlur = 18;
+      ctx.shadowColor = '#f472b6';
 
-      // Earthquake Mega Trigger
-      if (coins >= 1000) {
-        screenShake = 35;
-        spawnSparks(CENTER_X, CENTER_Y, '#f59e0b', 40);
-        // Blast all players outward
-        players.forEach(p => {
-          const angle = Math.atan2(p.y - CENTER_Y, p.x - CENTER_X);
-          p.vx += Math.cos(angle) * 18;
-          p.vy += Math.sin(angle) * 18;
-        });
-      }
+      // Ceramic Bowl
+      ctx.fillStyle = '#f43f5e';
+      ctx.beginPath();
+      ctx.ellipse(CAT_X, BOWL_Y, 130, 48, 0, 0, Math.PI * 2);
+      ctx.fill();
 
-      // Check if player is already in the arena
-      let player = players.find(p => p.name === username && !p.falling);
+      ctx.fillStyle = '#e11d48';
+      ctx.beginPath();
+      ctx.ellipse(CAT_X, BOWL_Y - 8, 120, 36, 0, 0, Math.PI * 2);
+      ctx.fill();
 
-      if (player) {
-        // Upgrade / Boost Existing Player
-        if (coins >= 100) {
-          player.isTitan = true;
-          player.radius = 56;
-          player.mass = 4.0;
-          player.color = '#f59e0b';
-        } else if (coins >= 30) {
-          player.isArmor = true;
-          player.mass = 2.2;
-          player.color = '#38bdf8';
-        }
+      // Treats inside bowl
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath();
+      ctx.ellipse(CAT_X, BOWL_Y - 10, 100, 26, 0, 0, Math.PI * 2);
+      ctx.fill();
 
-        // Sudden forward dash towards nearest player
-        const target = players.find(other => other !== player && !other.falling);
-        if (target) {
-          const angle = Math.atan2(target.y - player.y, target.x - player.x);
-          player.vx += Math.cos(angle) * 16;
-          player.vy += Math.sin(angle) * 16;
-        }
-        spawnSparks(player.x, player.y, player.color, 15);
-      } else {
-        // Spawn New Player inside arena
-        const spawnAngle = Math.random() * Math.PI * 2;
-        const spawnDist = Math.random() * (arenaRadius * 0.65);
-        const x = CENTER_X + Math.cos(spawnAngle) * spawnDist;
-        const y = CENTER_Y + Math.sin(spawnAngle) * spawnDist;
+      // Bowl Text
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🐾 CHONK', CAT_X, BOWL_Y + 14);
 
-        const isTitan = coins >= 100;
-        const isArmor = coins >= 30 && !isTitan;
+      ctx.restore();
+    }
 
-        const newP = {
-          name: username,
-          x: x,
-          y: y,
-          vx: (Math.random() - 0.5) * 4,
-          vy: (Math.random() - 0.5) * 4,
-          radius: isTitan ? 56 : 34,
-          mass: isTitan ? 4.0 : (isArmor ? 2.2 : 1.0),
-          isTitan: isTitan,
-          isArmor: isArmor,
-          color: isTitan ? '#f59e0b' : (isArmor ? '#38bdf8' : '#ec4899'),
-          wanderAngle: Math.random() * Math.PI * 2,
-          falling: false,
-          fallScale: 1.0,
-          opacity: 1.0,
-          img: null
-        };
+    // --- FOOD CONSUMPTION LOGIC ---
+    function eatFood(food) {
+      chewTimer = 22; // Start chewing mouth animation
 
-        if (avatarUrl) {
-          newP.img = new Image();
-          newP.img.src = avatarUrl;
-        }
+      currentTreats = Math.min(maxTreats, currentTreats + food.points);
+      updateTreatBar();
 
-        players.push(newP);
-        totalSpawned++;
-        spawnSparks(x, y, newP.color, 20);
-        updateHUD();
+      // Update Top Feeder Leaderboard
+      feederScores[food.username] = (feederScores[food.username] || 0) + food.points;
+      updateLeaderboard(food.username, food.imgSrc);
+
+      // Spawn floating hearts & "NOM NOM"
+      spawnNomParticles(CAT_X, BOWL_Y - 40, food.points);
+
+      // Check Chonky Level Up
+      if (currentTreats >= maxTreats) {
+        triggerCelebration();
       }
     }
 
-    function spawnSparks(x, y, color, count) {
+    function spawnNomParticles(x, y, points) {
+      // Hearts
+      const count = points >= 30 ? 15 : 6;
       for (let i = 0; i < count; i++) {
-        const ang = Math.random() * Math.PI * 2;
-        const spd = 2 + Math.random() * 6;
         particles.push({
-          x: x,
+          x: x + (Math.random() - 0.5) * 80,
           y: y,
-          vx: Math.cos(ang) * spd,
-          vy: Math.sin(ang) * spd,
-          size: 2 + Math.random() * 3,
-          color: color,
+          vx: (Math.random() - 0.5) * 4,
+          vy: -2 - Math.random() * 4,
+          size: 20 + Math.random() * 14,
+          isHeart: true,
+          char: Math.random() > 0.5 ? '💖' : '✨',
           life: 1.0
         });
       }
+
+      // NOM NOM Text Popup
+      particles.push({
+        x: x,
+        y: y - 30,
+        vx: 0,
+        vy: -1.5,
+        size: points >= 30 ? 30 : 22,
+        isHeart: true,
+        char: points >= 100 ? '😻 YUMMY!!' : '😋 NOM NOM!',
+        life: 1.0
+      });
     }
 
-    function updateHUD() {
-      const activeSurvivors = players.filter(p => !p.falling).length;
-      document.getElementById('survivors-count').innerText = activeSurvivors;
-      document.getElementById('total-spawns').innerText = totalSpawned;
+    function updateTreatBar() {
+      const pct = Math.round((currentTreats / maxTreats) * 100);
+      document.getElementById('food-bar').style.width = `${pct}%`;
+      document.getElementById('food-bar-text').innerText = `${currentTreats} / ${maxTreats} TREATS (${pct}%)`;
     }
 
-    function checkVictory() {
-      if (!roundActive) return;
-      const alive = players.filter(p => !p.falling);
-      if (totalSpawned >= 2 && alive.length === 1) {
-        endRound(alive[0]);
+    function updateLeaderboard(username, avatarUrl) {
+      // Find top scorer
+      let topUser = username;
+      let topScore = 0;
+      for (const [u, pts] of Object.entries(feederScores)) {
+        if (pts > topScore) { topScore = pts; topUser = u; }
+      }
+
+      document.getElementById('top-feeder-name').innerText = `${topUser} (${topScore} pts)`;
+      if (avatarUrl) {
+        document.getElementById('top-feeder-img').src = avatarUrl;
       }
     }
 
-    function endRound(winner) {
-      roundActive = false;
-      const banner = document.getElementById('winner-banner');
-      document.getElementById('winner-name').innerText = winner.name;
-      const pfp = document.getElementById('winner-pfp');
-      if (winner.img) pfp.src = winner.img.src;
-      else pfp.src = 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
+    function triggerCelebration() {
+      const banner = document.getElementById('celebrate-banner');
+      chonkLevel++;
+      document.getElementById('cat-level-badge').innerText = `🐱 LEVEL ${chonkLevel}: ULTRA MEGA CHONK`;
 
       banner.style.transform = 'translate(-50%, -50%) scale(1)';
 
-      setTimeout(() => {
-        resetRound();
-      }, 6000);
-    }
-
-    function resetRound() {
-      const banner = document.getElementById('winner-banner');
-      banner.style.transform = 'translate(-50%, -50%) scale(0)';
-      players.length = 0;
-      particles.length = 0;
-      arenaRadius = INITIAL_RADIUS;
-      roundTime = 90;
-      totalSpawned = 0;
-      updateHUD();
-      roundActive = true;
-    }
-
-    // --- COUNTDOWN TIMER ---
-    setInterval(() => {
-      if (!roundActive) return;
-      if (roundTime > 0) {
-        roundTime--;
-        const m = String(Math.floor(roundTime / 60)).padStart(2, '0');
-        const s = String(roundTime % 60).padStart(2, '0');
-        document.getElementById('timer-val').innerText = `${m}:${s}`;
-      } else {
-        // Time expired: crown biggest/closest survivor
-        const alive = players.filter(p => !p.falling);
-        if (alive.length > 0) endRound(alive[0]);
-        else resetRound();
+      // Golden particle fountain
+      for (let i = 0; i < 50; i++) {
+        particles.push({
+          x: CAT_X,
+          y: CAT_Y,
+          vx: (Math.random() - 0.5) * 14,
+          vy: -6 - Math.random() * 10,
+          size: 6 + Math.random() * 6,
+          color: '#f59e0b',
+          isHeart: false,
+          life: 1.5
+        });
       }
-    }, 1000);
+
+      setTimeout(() => {
+        banner.style.transform = 'translate(-50%, -50%) scale(0)';
+        currentTreats = 20;
+        maxTreats = Math.round(maxTreats * 1.5); // Harder each level
+        updateTreatBar();
+      }, 5000);
+    }
+
+    function resetChonk() {
+      currentTreats = 30;
+      maxTreats = 200;
+      chonkLevel = 1;
+      catScale = 1.0;
+      document.getElementById('cat-level-badge').innerText = '🐱 LEVEL 1: CUTE CHONK';
+      updateTreatBar();
+    }
+
+    // --- FOOD SPAWN HANDLER ---
+    function spawnFood(username, avatarUrl, coins) {
+      let emoji = '🐟';
+      let points = 1;
+
+      if (coins >= 1000) {
+        emoji = '👑';
+        points = 1000;
+      } else if (coins >= 100) {
+        emoji = '🍗';
+        points = 100;
+      } else if (coins >= 30) {
+        emoji = '🥫';
+        points = 30;
+      } else if (coins >= 10) {
+        emoji = '🥛';
+        points = 10;
+      }
+
+      const foodItem = {
+        username: username,
+        emoji: emoji,
+        points: points,
+        x: CAT_X + (Math.random() - 0.5) * 160,
+        y: 60,
+        vx: (Math.random() - 0.5) * 2,
+        vy: 2 + Math.random() * 2,
+        rot: (Math.random() - 0.5) * 0.4,
+        imgSrc: avatarUrl,
+        img: null
+      };
+
+      if (avatarUrl) {
+        foodItem.img = new Image();
+        foodItem.img.src = avatarUrl;
+      }
+
+      foods.push(foodItem);
+    }
 
     // Testing Controls
     window.toggleTestPanel = function() {
@@ -604,20 +740,20 @@
       p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
     };
 
-    window.testGift = function(coins) {
-      const botNames = ['Alex', 'Leo', 'Speed', 'Zack', 'Viper', 'Ghost'];
-      const randomName = botNames[Math.floor(Math.random() * botNames.length)];
-      handleGift(randomName, null, coins);
+    window.testTreat = function(coins) {
+      const names = ['Sarah', 'KittyLover', 'NyanCat', 'Alex', 'Leo'];
+      const randomName = names[Math.floor(Math.random() * names.length)];
+      spawnFood(randomName, null, coins);
     };
 
-    // --- WEBSOCKET LISTENER ---
+    // --- WEBSOCKET EVENT LISTENER ---
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const socket = new WebSocket(`${protocol}//${window.location.host}`);
 
     socket.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
       if (data.type === 'GIFT') {
-        handleGift(data.username, data.avatar, data.diamondCount || 1);
+        spawnFood(data.username, data.avatar, data.diamondCount || 1);
       }
     };
 
@@ -625,3 +761,4 @@
   </script>
 </body>
 </html>
+    
