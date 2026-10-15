@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#110d2e">
   <title>Feed the Chonky Cat Live</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,6 +19,7 @@
       width: 100vw;
     }
 
+    /* Secret tap area at top of screen to show/hide testing buttons */
     #secret-tap-zone {
       position: absolute; top: 0; left: 0; width: 100%; height: 50px; z-index: 100;
     }
@@ -42,7 +47,6 @@
       border: 2px solid #fef3c7;
     }
 
-    /* Chonk Progress Bar */
     .bar-container {
       width: 92%;
       height: 22px;
@@ -70,7 +74,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* Recent Feeder Pop Banner */
     #recent-feed-toast {
       background: rgba(15, 23, 42, 0.95);
       border: 1.5px solid #38bdf8;
@@ -123,7 +126,7 @@
     .text-pink { color: #f472b6; }
     .text-gold { color: #f59e0b; }
 
-    /* --- BOTTOM: DEDICATED TOP FEEDERS LEADERBOARD --- */
+    /* --- BOTTOM: TOP 3 FEEDERS LEADERBOARD --- */
     #feeders-panel {
       position: absolute;
       bottom: 14px;
@@ -167,7 +170,6 @@
       justify-content: space-between;
     }
 
-    /* Feeder Rank Cards */
     .feeder-card {
       flex: 1;
       background: rgba(30, 41, 59, 0.8);
@@ -245,21 +247,24 @@
     #celebrate-title { font-size: 28px; font-weight: 900; color: #f59e0b; margin-bottom: 6px; }
     #celebrate-sub { font-size: 15px; color: #cbd5e1; }
 
-    /* Testing controls */
+    /* Testing controls (Hidden by default, tap top of screen to toggle) */
     #test-panel {
-      position: absolute; bottom: 120px; left: 16px;
-      display: none; gap: 6px; background: rgba(0,0,0,0.9); padding: 8px 10px;
-      border-radius: 12px; z-index: 150;
+      position: absolute; bottom: 125px; left: 50%; transform: translateX(-50%);
+      display: none; gap: 6px; background: rgba(0,0,0,0.92); padding: 8px 10px;
+      border-radius: 14px; z-index: 150; width: 92%; max-width: 460px;
+      flex-wrap: wrap; justify-content: center;
     }
     button {
       border: none; padding: 6px 10px; border-radius: 6px;
       font-weight: 900; cursor: pointer; font-size: 11px;
     }
+    .btn-fs { background: #22c55e; color: #000; }
     .btn-snack { background: #f472b6; color: #000; }
     .btn-feast { background: #f59e0b; color: #000; }
   </style>
 </head>
 <body>
+  <!-- Secret Tap Zone at top to show/hide testing buttons -->
   <div id="secret-tap-zone" onclick="toggleTestPanel()"></div>
 
   <!-- Top HUD -->
@@ -313,14 +318,13 @@
 
   <canvas id="game-canvas"></canvas>
 
-  <!-- --- BOTTOM: TOP 3 FEEDERS LEADERBOARD --- -->
+  <!-- Bottom Top 3 Feeders Leaderboard -->
   <div id="feeders-panel">
     <div class="feeders-header">
       <span class="feeders-title">🏆 TOP CHONK FEEDERS</span>
       <span class="feeders-subtitle">Gifts Level Up Cat!</span>
     </div>
     <div class="feeders-list">
-      <!-- Rank 1 -->
       <div class="feeder-card rank-1">
         <div class="feeder-avatar-box">
           <img class="feeder-pfp" id="rank1-img" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png">
@@ -330,7 +334,6 @@
         <div class="feeder-treats" id="rank1-treats">0 treats</div>
       </div>
 
-      <!-- Rank 2 -->
       <div class="feeder-card rank-2">
         <div class="feeder-avatar-box">
           <img class="feeder-pfp" id="rank2-img" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png">
@@ -340,7 +343,6 @@
         <div class="feeder-treats" id="rank2-treats">0 treats</div>
       </div>
 
-      <!-- Rank 3 -->
       <div class="feeder-card rank-3">
         <div class="feeder-avatar-box">
           <img class="feeder-pfp" id="rank3-img" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png">
@@ -358,8 +360,9 @@
     <div id="celebrate-sub">Cat evolved to the next level of chonkiness!</div>
   </div>
 
-  <!-- Testing Panel -->
+  <!-- Testing Panel (Includes Fullscreen Button) -->
   <div id="test-panel">
+    <button class="btn-fs" onclick="toggleFullscreen()">⛶ Fullscreen</button>
     <button class="btn-snack" onclick="testTreat(1)">+1 Fish</button>
     <button class="btn-snack" onclick="testTreat(10)">+10 Milk</button>
     <button class="btn-feast" onclick="testTreat(30)">+30 Tuna</button>
@@ -376,18 +379,15 @@
     canvas.width = WIDTH;
     canvas.height = HEIGHT;
 
-    // Cat Position (Positioned slightly higher to leave room for the feeders podium)
     const CAT_X = WIDTH / 2;
     const CAT_Y = HEIGHT * 0.54;
     const BOWL_Y = CAT_Y + 160;
 
-    // Chonk Progression
     let currentTreats = 30;
     let maxTreats = 200;
     let chonkLevel = 1;
     let catScale = 1.0;
 
-    // Animation Timers
     let animFrame = 0;
     let mouthOpen = 0;
     let chewTimer = 0;
@@ -397,9 +397,8 @@
 
     const foods = [];
     const particles = [];
-    const feeders = {}; // Key: username, Value: { points, avatar }
+    const feeders = {};
 
-    // --- GAME ENGINE LOOP ---
     function update() {
       animFrame++;
 
@@ -449,14 +448,12 @@
     function render() {
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-      // Room Background
       const bg = ctx.createRadialGradient(CAT_X, CAT_Y - 100, 80, CAT_X, CAT_Y, 800);
       bg.addColorStop(0, '#2e1065');
       bg.addColorStop(1, '#0c081e');
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-      // Cozy Rug under cat
       ctx.save();
       ctx.shadowBlur = 30;
       ctx.shadowColor = 'rgba(244, 114, 182, 0.25)';
@@ -466,7 +463,6 @@
       ctx.fill();
       ctx.restore();
 
-      // Floating particles
       for (const pt of particles) {
         ctx.save();
         ctx.globalAlpha = pt.life;
@@ -483,11 +479,9 @@
         ctx.restore();
       }
 
-      // Draw Cat & Bowl
       drawAnimatedCat();
       drawBowl();
 
-      // Draw Dropping Foods with User Avatars
       for (const f of foods) {
         ctx.save();
         ctx.translate(f.x, f.y);
@@ -526,7 +520,6 @@
       }
     }
 
-    // --- PROCEDURAL CAT DRAWING ---
     function drawAnimatedCat() {
       ctx.save();
       ctx.translate(CAT_X, CAT_Y);
@@ -545,7 +538,7 @@
       ctx.stroke();
       ctx.restore();
 
-      // Chonky Body
+      // Body
       ctx.save();
       ctx.shadowBlur = 25;
       ctx.shadowColor = 'rgba(249, 115, 22, 0.4)';
@@ -555,13 +548,13 @@
       ctx.fill();
       ctx.restore();
 
-      // Belly Patch
+      // Belly
       ctx.fillStyle = '#ffedd5';
       ctx.beginPath();
       ctx.ellipse(0, 70, 100, 90, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Left Ear
+      // Ears
       ctx.fillStyle = '#ea580c';
       ctx.beginPath();
       ctx.moveTo(-105, -105); ctx.lineTo(-58, -180); ctx.lineTo(-20, -115);
@@ -571,7 +564,6 @@
       ctx.moveTo(-92, -110); ctx.lineTo(-58, -162); ctx.lineTo(-34, -120);
       ctx.closePath(); ctx.fill();
 
-      // Right Ear
       ctx.fillStyle = '#ea580c';
       ctx.beginPath();
       ctx.moveTo(105, -105); ctx.lineTo(58, -180); ctx.lineTo(20, -115);
@@ -681,26 +673,20 @@
       ctx.restore();
     }
 
-    // --- FOOD INTAKE & FEEDERS LEADERBOARD ---
     function eatFood(food) {
       chewTimer = 22;
 
       currentTreats = Math.min(maxTreats, currentTreats + food.points);
       updateTreatBar();
 
-      // Update Feeders Data
       if (!feeders[food.username]) {
         feeders[food.username] = { points: 0, avatar: food.imgSrc };
       }
       feeders[food.username].points += food.points;
       if (food.imgSrc) feeders[food.username].avatar = food.imgSrc;
 
-      // Update Leaderboard UI
       updateFeedersDisplay();
-
-      // Trigger Feeder Toast
       showFeedToast(food.username, food.points, food.emoji);
-
       spawnNomParticles(CAT_X, BOWL_Y - 40, food.points);
 
       if (currentTreats >= maxTreats) {
@@ -721,28 +707,20 @@
     }
 
     function updateFeedersDisplay() {
-      // Sort feeders descending by total treats
       const sorted = Object.entries(feeders)
         .sort((a, b) => b[1].points - a[1].points)
         .slice(0, 3);
 
-      const placeholder = 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
-
-      // Rank 1
       if (sorted[0]) {
         document.getElementById('rank1-name').innerText = sorted[0][0];
         document.getElementById('rank1-treats').innerText = `${sorted[0][1].points} treats`;
         if (sorted[0][1].avatar) document.getElementById('rank1-img').src = sorted[0][1].avatar;
       }
-
-      // Rank 2
       if (sorted[1]) {
         document.getElementById('rank2-name').innerText = sorted[1][0];
         document.getElementById('rank2-treats').innerText = `${sorted[1][1].points} treats`;
         if (sorted[1][1].avatar) document.getElementById('rank2-img').src = sorted[1][1].avatar;
       }
-
-      // Rank 3
       if (sorted[2]) {
         document.getElementById('rank3-name').innerText = sorted[2][0];
         document.getElementById('rank3-treats').innerText = `${sorted[2][1].points} treats`;
@@ -859,10 +837,19 @@
       foods.push(foodItem);
     }
 
-    // Testing Controls
+    // Toggle Secret Panel
     window.toggleTestPanel = function() {
       const p = document.getElementById('test-panel');
       p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
+    };
+
+    // Toggle Mobile Fullscreen Mode
+    window.toggleFullscreen = function() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
     };
 
     window.testTreat = function(coins) {
@@ -886,3 +873,5 @@
   </script>
 </body>
 </html>
+
+   
