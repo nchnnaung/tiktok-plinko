@@ -8,69 +8,120 @@
     body { margin: 0; background: #0b0c16; overflow: hidden; font-family: sans-serif; }
     #canvas-box { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-    /* On-Screen Gift Rules Banner */
-    #gift-banner {
+    /* --- Neon Sidebar Gift Rules (Placed in Vacant Left/Right Gaps) --- */
+    .sidebar-rules {
       position: absolute;
-      top: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 12px;
-      background: rgba(18, 20, 38, 0.9);
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      border-radius: 30px;
-      padding: 10px 18px;
+      top: 130px; /* Aligned perfectly to the upper-middle side voids */
       z-index: 50;
-      pointer-events: none;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-    }
-    .rule-tag {
-      color: #ffffff;
-      font-size: 13px;
-      font-weight: 800;
       display: flex;
-      align-items: center;
-      gap: 5px;
-      white-space: nowrap;
+      flex-direction: column;
+      gap: 14px;
+      pointer-events: none;
     }
-    .rule-tag span {
-      color: #38bdf8;
+    
+    #rules-left { left: 24px; }
+    #rules-right { right: 24px; }
+
+    /* Basic & Epic Box Stylings */
+    .rule-card {
+      background: rgba(18, 20, 38, 0.85);
+      border: 2px solid #38bdf8;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.35);
+      border-radius: 16px;
+      padding: 10px 14px;
+      width: 145px;
+      color: white;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .rule-card.special {
+      border-color: #f59e0b;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.35);
     }
 
-    /* Hidden by default; tap top area to toggle */
+    .rule-card .header-title {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .rule-card .header-title.basic { color: #38bdf8; text-shadow: 0 0 5px rgba(56, 189, 248, 0.5); }
+    .rule-card .header-title.epic { color: #f59e0b; text-shadow: 0 0 5px rgba(245, 158, 11, 0.5); }
+
+    .rule-card .icon { font-size: 28px; display: block; margin-bottom: 2px; }
+    .rule-card .gift-name { font-size: 13px; font-weight: 700; color: #94a3b8; }
+    .rule-card .equals { font-size: 12px; font-weight: 600; color: #475569; margin: 2px 0; }
+    .rule-card .outcome { font-size: 15px; font-weight: 900; color: #38bdf8; }
+    .rule-card.special .outcome { color: #f59e0b; }
+
+    /* Hidden testing options panel */
     #test-panel {
       position: absolute; bottom: 20px; left: 20px; z-index: 100;
-      display: none; gap: 10px; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 8px;
+      display: none; gap: 8px; background: rgba(0,0,0,0.6); padding: 8px; border-radius: 8px;
     }
     button {
-      background: #38bdf8; border: none; padding: 8px 14px;
+      background: #38bdf8; border: none; padding: 8px 12px;
       border-radius: 6px; font-weight: bold; cursor: pointer; color: #000;
+      font-size: 12px;
     }
 
-    /* Secret tap zone */
+    /* Secret double-tap zone */
     #secret-tap-zone {
-      position: absolute; top: 0; left: 0; width: 100%; height: 70px; z-index: 60;
+      position: absolute; top: 0; left: 0; width: 100%; height: 75px; z-index: 60;
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
 <body>
-  <!-- Secret Tap Zone to show/hide test buttons -->
+  <!-- Hidden Toggler top-trigger zone -->
   <div id="secret-tap-zone" onclick="toggleTestPanel()"></div>
 
-  <!-- Viewer Live Gift Rules -->
-  <div id="gift-banner">
-    <div class="rule-tag">🌹 1 Rose = <span>1 Ball</span></div>
-    <div class="rule-tag">🍩 30 = <span>5 Balls</span></div>
-    <div class="rule-tag">🎉 100 = <span>15 Balls</span></div>
+  <!-- Left Sidebar (Basic Tier) -->
+  <div class="sidebar-rules" id="rules-left">
+    <div class="rule-card">
+      <div class="header-title basic">🎁 BASIC TIER</div>
+      <span class="icon">🌹</span>
+      <div class="gift-name">1 Rose</div>
+      <div class="equals">=</div>
+      <div class="outcome">1 BALL</div>
+    </div>
+    <div class="rule-card">
+      <div class="header-title basic">🍩 MULTI-DROP</div>
+      <span class="icon">🍩</span>
+      <div class="gift-name">30 Coins</div>
+      <div class="equals">=</div>
+      <div class="outcome">5 BALLS</div>
+    </div>
+  </div>
+
+  <!-- Right Sidebar (Epic/Legendary Tier) -->
+  <div class="sidebar-rules" id="rules-right">
+    <div class="rule-card special">
+      <div class="header-title epic">🔥 EPIC TIER</div>
+      <span class="icon">🎉</span>
+      <div class="gift-name">100 Coins</div>
+      <div class="equals">=</div>
+      <div class="outcome">15 BALLS</div>
+    </div>
+    <div class="rule-card special">
+      <div class="header-title epic">🦁 LEGENDARY</div>
+      <span class="icon">🦁</span>
+      <div class="gift-name">1000+ Coins</div>
+      <div class="equals">=</div>
+      <div class="outcome">150 BALLS</div>
+    </div>
   </div>
 
   <div id="canvas-box"></div>
 
+  <!-- Updated tester triggers for our new sizes -->
   <div id="test-panel">
     <button onclick="testDrop(1)">Test 1</button>
     <button onclick="testDrop(30)">Test 30</button>
     <button onclick="testDrop(100)">Test 100</button>
+    <button onclick="testDrop(1000)">Test 1000</button>
   </div>
 
   <script>
@@ -160,7 +211,10 @@
 
     function dropAvatar(name, avatarUrl, coins) {
       let count = 1;
-      if (coins >= 100) count = 15;
+      
+      // Match the drop logic perfectly with the side rule sizes!
+      if (coins >= 1000) count = 150;
+      else if (coins >= 100) count = 15;
       else if (coins >= 30) count = 5;
       else count = 1;
 
