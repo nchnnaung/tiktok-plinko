@@ -3,277 +3,539 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Ronaldo vs Messi Live Race</title>
+  <title>Ronaldo vs Messi - Race to 1000 Goals</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      background: #000;
+      background: #020713;
       overflow: hidden;
-      font-family: 'Impact', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       user-select: none;
       height: 100vh;
       width: 100vw;
-    }
-
-    /* Secret tap area to reveal offline test buttons */
-    #secret-tap-zone {
-      position: absolute; top: 0; left: 0; width: 100%; height: 60px; z-index: 100;
-    }
-
-    /* --- THE EXACT PHOTO AS THE LIVE BACKGROUND --- */
-    #background-poster {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: url('/bg.jpg') no-repeat center center;
-      background-size: 100% 100%;
-      z-index: 1;
-    }
-
-    /* --- LIVE COUNTERS OVERLAYING THE IMAGE STATS --- */
-    .live-counter {
-      position: absolute;
-      left: 52%;
-      font-size: 44px;
-      font-weight: 900;
-      letter-spacing: -1px;
-      z-index: 10;
-      padding: 0 4px;
-    }
-    #ronaldo-counter {
-      top: 9.8%;
-      color: #facc15;
-      text-shadow: 0 0 16px rgba(250, 204, 21, 0.9), 2px 2px 0px #000;
-    }
-    #messi-counter {
-      top: 59.8%;
-      color: #fef08a;
-      text-shadow: 0 0 16px rgba(254, 240, 138, 0.9), 2px 2px 0px #000;
-    }
-
-    /* --- GIFT RULES MARKED BESIDE PLAYERS --- */
-    .gift-box {
-      position: absolute;
-      z-index: 20;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+    }
+
+    /* Secret tap area at top of screen to toggle offline test buttons */
+    #secret-tap-zone {
+      position: absolute; top: 0; left: 0; width: 100%; height: 50px; z-index: 100;
+    }
+
+    /* --- COMMON SECTION STYLING (NAVY DOTTED STADIUM PATTERN) --- */
+    .half-section {
+      flex: 1;
+      position: relative;
+      display: flex;
+      padding: 16px 12px;
+      overflow: hidden;
+      background-color: #030b1b;
+      background-image: 
+        radial-gradient(circle at 10% 40%, rgba(20, 55, 115, 0.45) 0%, transparent 70%),
+        radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
+      background-size: 100% 100%, 18px 18px;
+    }
+
+    /* --- YELLOW CENTER DIVIDER --- */
+    #divider-line {
+      height: 4px;
+      background: #ffe600;
+      box-shadow: 0 0 14px rgba(255, 230, 0, 0.85);
+      z-index: 40;
+    }
+
+    /* --- LEFT SIDE: PLAYER CUTOUT & GIFT RULES --- */
+    .left-col {
+      width: 44%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .player-cutout {
+      max-width: 125%;
+      max-height: 84%;
+      object-fit: contain;
+      filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.85));
+      transform: scale(1.08);
+      transform-origin: bottom center;
+    }
+
+    /* Glowing Gift Action Badges Tucked Beside Player */
+    .gift-rules-stack {
+      position: absolute;
+      top: 6px;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 25;
       pointer-events: none;
     }
 
-    /* Beside Ronaldo */
-    #ronaldo-rules {
-      top: 26%;
-      left: 10px;
-    }
-
-    /* Beside Messi */
-    #messi-rules {
-      top: 76%;
-      left: 10px;
-    }
-
-    .gift-pill {
-      background: rgba(11, 15, 30, 0.92);
-      border-radius: 12px;
-      padding: 5px 10px;
+    .gift-chip {
+      background: rgba(4, 11, 28, 0.88);
+      border-radius: 10px;
+      padding: 4px 8px;
       display: flex;
       align-items: center;
       gap: 6px;
       color: #ffffff;
-      font-family: -apple-system, sans-serif;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.8);
-      border: 2px solid;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+    }
+    .chip-ronaldo {
+      border: 1.5px solid #ffe600;
+      box-shadow: 0 0 10px rgba(255, 230, 0, 0.3);
+    }
+    .chip-messi {
+      border: 1.5px solid #f472b6;
+      box-shadow: 0 0 10px rgba(244, 114, 182, 0.3);
     }
 
-    .pill-ronaldo {
-      border-color: #facc15;
-      box-shadow: 0 0 12px rgba(250, 204, 21, 0.4);
-    }
-    .pill-messi {
-      border-color: #f472b6;
-      box-shadow: 0 0 12px rgba(244, 114, 182, 0.4);
+    .chip-emoji { font-size: 18px; line-height: 1; }
+    .chip-text { font-size: 10px; font-weight: 800; color: #cbd5e1; }
+    .chip-gain { font-size: 11px; font-weight: 900; }
+    .gain-yellow { color: #ffe600; }
+    .gain-pink { color: #f472b6; }
+
+    /* --- RIGHT SIDE: STATS, PROGRESS & CLUB BREAKDOWN --- */
+    .right-col {
+      width: 56%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 8px;
+      padding-top: 10px;
+      z-index: 10;
     }
 
-    .gift-icon { font-size: 20px; line-height: 1; }
-    .gift-name { font-size: 11px; font-weight: 800; color: #cbd5e1; }
-    .gift-val { font-size: 12px; font-weight: 900; }
-    .val-ronaldo { color: #facc15; }
-    .val-messi { color: #f472b6; }
+    .brand-tag {
+      align-self: flex-end;
+      font-size: 13px;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.7);
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
 
-    /* Floating Supporter Goals */
+    /* Giant 979/1000 & 928/1000 Number */
+    .giant-score {
+      font-family: 'Impact', 'Arial Black', sans-serif;
+      font-size: 46px;
+      letter-spacing: -0.5px;
+      line-height: 0.95;
+      color: #ffe600;
+      text-shadow: 0 0 20px rgba(255, 230, 0, 0.45);
+      margin-bottom: 8px;
+    }
+
+    /* Stadium Yellow Progress Bar */
+    .progress-capsule {
+      width: 100%;
+      height: 18px;
+      border: 2px solid #ffe600;
+      border-radius: 9px;
+      background: rgba(2, 7, 19, 0.7);
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 0 6px;
+      margin-bottom: 14px;
+      box-shadow: 0 0 10px rgba(255, 230, 0, 0.25);
+    }
+
+    .progress-fill {
+      position: absolute;
+      left: 2px;
+      top: 2px;
+      bottom: 2px;
+      background: #ffe600;
+      border-radius: 6px;
+      transition: width 0.3s ease-out;
+      z-index: 1;
+    }
+
+    .progress-label-left {
+      position: relative;
+      z-index: 2;
+      font-size: 10px;
+      font-weight: 900;
+      color: #000;
+      letter-spacing: 0.5px;
+    }
+
+    .progress-label-right {
+      position: absolute;
+      right: 6px;
+      z-index: 2;
+      font-size: 10px;
+      font-weight: 900;
+      color: #ffe600;
+    }
+
+    /* Club Badges Breakdown Row */
+    .clubs-row {
+      display: flex;
+      gap: 5px;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .club-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+
+    .club-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: 900;
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+      margin-bottom: 3px;
+    }
+
+    .club-goals {
+      font-family: 'Impact', sans-serif;
+      font-size: 15px;
+      color: #ffe600;
+      line-height: 1;
+    }
+
+    .club-subtext {
+      font-size: 8px;
+      font-weight: 800;
+      color: #94a3b8;
+      letter-spacing: 0.5px;
+    }
+
+    /* Games Played Footer Text */
+    .games-footer {
+      font-size: 11px;
+      font-weight: 900;
+      font-style: italic;
+      color: rgba(255, 255, 255, 0.85);
+      letter-spacing: 0.5px;
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    /* Club Badges Color Styling */
+    .bg-sporting { background: #006633; border-color: #ffe600; }
+    .bg-manutd   { background: #da020e; border-color: #ffe600; }
+    .bg-real     { background: #ffffff; color: #000; border-color: #e5a93b; }
+    .bg-juve     { background: #000000; border-color: #ffffff; }
+    .bg-nassr    { background: #ffe600; color: #001f54; border-color: #001f54; }
+    .bg-portugal { background: #b31b1b; border-color: #006633; }
+
+    .bg-barca     { background: #a50044; border-color: #004d98; }
+    .bg-psg       { background: #001c3e; border-color: #da291c; }
+    .bg-miami     { background: #f472b6; color: #000; border-color: #000; }
+    .bg-argentina { background: #75aadb; border-color: #ffffff; }
+
+    /* --- FLOATING SUPPORTER GOAL TOKENS --- */
     .goal-popup {
       position: absolute;
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(15, 23, 42, 0.96);
-      padding: 6px 14px;
+      gap: 6px;
+      background: rgba(4, 11, 28, 0.95);
+      padding: 6px 12px;
       border-radius: 20px;
       color: white;
       font-weight: 900;
-      font-size: 14px;
-      font-family: -apple-system, sans-serif;
-      box-shadow: 0 0 20px rgba(0,0,0,0.9);
+      font-size: 13px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.85);
       pointer-events: none;
-      z-index: 50;
+      z-index: 80;
       animation: floatUp 1.8s forwards;
     }
-    .popup-ronaldo { border: 2px solid #facc15; }
-    .popup-messi { border: 2px solid #f472b6; }
+    .popup-cr7 { border: 2px solid #ffe600; }
+    .popup-lm10 { border: 2px solid #f472b6; }
     .goal-popup img {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
-      border: 2px solid #fff;
-    }
-    @keyframes floatUp {
-      0% { opacity: 0; transform: translateY(20px) scale(0.8); }
-      20% { opacity: 1; transform: translateY(0) scale(1.1); }
-      80% { opacity: 1; transform: translateY(-40px) scale(1); }
-      100% { opacity: 0; transform: translateY(-70px) scale(0.8); }
+      border: 1.5px solid #fff;
     }
 
-    /* Victory Banner */
+    @keyframes floatUp {
+      0% { opacity: 0; transform: translateY(15px) scale(0.8); }
+      20% { opacity: 1; transform: translateY(0) scale(1.1); }
+      80% { opacity: 1; transform: translateY(-30px) scale(1); }
+      100% { opacity: 0; transform: translateY(-55px) scale(0.8); }
+    }
+
+    /* --- VICTORY OVERLAY BANNER --- */
     #winner-banner {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
-      background: rgba(11, 15, 30, 0.98); padding: 30px; border-radius: 26px;
+      background: rgba(4, 11, 28, 0.98); padding: 28px 24px; border-radius: 24px;
       text-align: center; color: white; z-index: 200;
       box-shadow: 0 0 60px rgba(0, 0, 0, 0.95);
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      border: 4px solid #facc15; width: 90%;
-      font-family: -apple-system, sans-serif;
+      border: 4px solid #ffe600;
+      width: 88%;
     }
-    #winner-title { font-size: 30px; font-weight: 900; margin-bottom: 8px; }
-    #winner-sub { font-size: 16px; color: #94a3b8; }
+    #winner-title { font-size: 30px; font-weight: 900; margin-bottom: 6px; }
+    #winner-sub { font-size: 15px; color: #94a3b8; }
 
-    /* Hidden Testing Panel */
+    /* Hidden testing panel */
     #test-panel {
-      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-      display: none; gap: 8px; background: rgba(0,0,0,0.9); padding: 10px;
+      position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
+      display: none; gap: 8px; background: rgba(0,0,0,0.9); padding: 8px 12px;
       border-radius: 12px; z-index: 150;
     }
     button {
-      border: none; padding: 8px 12px; border-radius: 6px;
+      border: none; padding: 7px 11px; border-radius: 6px;
       font-weight: 900; cursor: pointer; font-size: 11px;
     }
-    .btn-ronaldo { background: #facc15; color: #000; }
-    .btn-messi { background: #f472b6; color: #000; }
+    .btn-cr7 { background: #ffe600; color: #000; }
+    .btn-lm10 { background: #f472b6; color: #000; }
   </style>
 </head>
 <body>
   <div id="secret-tap-zone" onclick="toggleTestPanel()"></div>
 
-  <!-- Background Poster Graphic -->
-  <div id="background-poster"></div>
-
-  <!-- Real-Time Live Counters Overlaid on Graphic -->
-  <div class="live-counter" id="ronaldo-counter">979/1000</div>
-  <div class="live-counter" id="messi-counter">928/1000</div>
-
-  <!-- Gift Rules Beside Ronaldo -->
-  <div class="gift-box" id="ronaldo-rules">
-    <div class="gift-pill pill-ronaldo">
-      <span class="gift-icon">🌹</span>
-      <div>
-        <div class="gift-name">1 Rose</div>
-        <div class="gift-val val-ronaldo">+1 GOAL</div>
+  <!-- ================= TOP HALF: RONALDO ================= -->
+  <div class="half-section" id="ronaldo-half">
+    <!-- Left: Cutout & Action Chips -->
+    <div class="left-col">
+      <div class="gift-rules-stack">
+        <div class="gift-chip chip-ronaldo">
+          <span class="chip-emoji">🌹</span>
+          <div>
+            <div class="chip-text">1 Rose</div>
+            <div class="chip-gain gain-yellow">+1 GOAL</div>
+          </div>
+        </div>
+        <div class="gift-chip chip-ronaldo">
+          <span class="chip-emoji">🍩</span>
+          <div>
+            <div class="chip-text">30 Coins</div>
+            <div class="chip-gain gain-yellow">+30 GOALS</div>
+          </div>
+        </div>
       </div>
+
+      <img class="player-cutout" 
+           src="https://images.fotmob.com/image_resources/playerimages/30955.png" 
+           alt="Ronaldo"
+           onerror="this.src='https://assets.stickpng.com/images/585ac0044f6ae202fedf2937.png'">
     </div>
-    <div class="gift-pill pill-ronaldo">
-      <span class="gift-icon">🍩</span>
-      <div>
-        <div class="gift-name">30 Coins</div>
-        <div class="gift-val val-ronaldo">+30 GOALS</div>
+
+    <!-- Right: Stats, Progress & Clubs -->
+    <div class="right-col">
+      <div class="brand-tag">Sportvia</div>
+      
+      <div class="giant-score" id="ronaldo-score-text">979/1000</div>
+
+      <div class="progress-capsule">
+        <div class="progress-fill" id="ronaldo-bar" style="width: 97.9%;"></div>
+        <span class="progress-label-left">GOALS</span>
+        <span class="progress-label-right" id="ronaldo-pct-text">97.9%</span>
       </div>
+
+      <!-- Club Breakdown Row matching your graphic -->
+      <div class="clubs-row">
+        <div class="club-item">
+          <div class="club-badge bg-sporting">SCP</div>
+          <div class="club-goals">5</div>
+          <div class="club-subtext">GOALS</div>
+        </div>
+        <div class="club-item">
+          <div class="club-badge bg-manutd">MU</div>
+          <div class="club-goals">145</div>
+          <div class="club-subtext">GOALS</div>
+        </div>
+        <div class="club-item">
+          <div class="club-badge bg-real">RMA</div>
+          <div class="club-goals">450</div>
+          <div class="club-subtext">GOALS</div>
+        </div>
+        <div class="club-item">
+          <div class="club-badge bg-juve">JUV</div>
+          <div class="club-goals">101</div>
+          <div class="club-subtext">GOALS</div>
+        </div>
+        <div class="club-item">
+          <div class="club-badge bg-nassr">NAS</div>
+          <div class="club-goals">132</div>
+          <div class="club-subtext">GOALS</div>
+        </div>
+        <div class="club-item">
+          <div class="club-badge bg-portugal">POR</div>
+          <div class="club-goals">146</div>
+          <div class="club-subtext">GOALS</div>
+        </div>
+      </div>
+
+      <div class="games-footer">AFTER 1336 GAMES SOFAR</div>
     </div>
   </div>
 
-  <!-- Gift Rules Beside Messi -->
-  <div class="gift-box" id="messi-rules">
-    <div class="gift-pill pill-messi">
-      <span class="gift-icon">⚡</span>
-      <div>
-        <div class="gift-name">TikTok Logo</div>
-        <div class="gift-val val-messi">+1 GOAL</div>
+  <!-- CENTER DIVIDER -->
+  <div id="divider-line"></div>
+
+  <!-- ================= BOTTOM HALF: MESSI ================= -->
+  <div class="half-section" id="messi-half">
+    <!-- Left: Cutout & Action Chips -->
+    <div class="left-col">
+      <div class="gift-rules-stack">
+        <div class="gift-chip chip-messi">
+          <span class="chip-emoji">⚡</span>
+          <div>
+            <div class="chip-text">TikTok Logo</div>
+            <div class="chip-gain gain-pink">+1 GOAL</div>
+          </div>
+        </div>
+        <div class="gift-chip chip-messi">
+          <span class="chip-emoji">🍩</span>
+          <div>
+            <div class="chip-text">30 Coins</div>
+            <div class="chip-gain gain-pink">+30 GOALS</div>
+          </div>
+        </div>
       </div>
+
+      <img class="player-cutout" 
+           src="https://images.fotmob.com/image_resources/playerimages/30981.png" 
+           alt="Messi"
+           onerror="this.src='https://assets.stickpng.com/images/585ac0044f6ae202fedf2935.png'">
     </div>
-    <div class="gift-pill pill-messi">
-      <span class="gift-icon">🍩</span>
-      <div>
-        <div class="gift-name">30 Coins</div>
-        <div class="gift-val val-messi">+30 GOALS</div>
+
+    <!-- Right: Stats, Progress & Clubs -->
+    <div class="right-col">
+      <div class="giant-score" id="messi-score-text">928/1000</div>
+
+      <div class="progress-capsule">
+        <div class="progress-fill" id="messi-bar" style="width: 92.8%;"></div>
+        <span class="progress-label-left">GOALS</span>
+        <span class="progress-label-right" id="messi-pct-text">92.8%</span>
       </div>
+
+      <!-- Club Breakdown Row matching your graphic -->
+      <div class="clubs-row">
+        <div class="club-item">
+          <div class="club-badge bg-barca">FCB</div>
+          <div class="club-goals">672</div>
+          <div class="club-subtext">GOALS</div>
+        </div>
+        <div class="club-item">
+          <div class="club-badge bg-psg">PSG</div>
+          <div class="club-goals">32</div>
+          <div class="club-subtext">GOALS</div>
+        </div>
+        <div class="club-item">
+          <div class="club-badge bg-miami">MIA</div>
+          <div class="club-goals">99</div>
+          <div class="club-subtext">GOALS</div>
+        </div>
+        <div class="club-item">
+          <div class="club-badge bg-argentina">ARG</div>
+          <div class="club-goals">125</div>
+          <div class="club-subtext">GOALS</div>
+        </div>
+      </div>
+
+      <div class="games-footer">AFTER 1173 GAMES SOFAR</div>
     </div>
   </div>
 
-  <!-- Victory Banner -->
+  <!-- VICTORY POPUP -->
   <div id="winner-banner">
-    <div id="winner-title">🏆 1,000 GOALS REACHED!</div>
+    <div id="winner-title">🏆 1,000 GOALS!</div>
     <div id="winner-sub">Next round starting in 6 seconds...</div>
   </div>
 
-  <!-- Secret Test Controls -->
+  <!-- OFFLINE TESTING CONTROLS -->
   <div id="test-panel">
-    <button class="btn-ronaldo" onclick="addGoals('ronaldo', 1, 'Tester')">+1 Rose (CR7)</button>
-    <button class="btn-ronaldo" onclick="addGoals('ronaldo', 10, 'Tester')">+10 CR7</button>
-    <button class="btn-messi" onclick="addGoals('messi', 1, 'Tester')">+1 Logo (LM10)</button>
-    <button class="btn-messi" onclick="addGoals('messi', 10, 'Tester')">+10 LM10</button>
+    <button class="btn-cr7" onclick="addGoals('ronaldo', 1, 'Tester')">+1 Rose (CR7)</button>
+    <button class="btn-cr7" onclick="addGoals('ronaldo', 10, 'Tester')">+10 CR7</button>
+    <button class="btn-lm10" onclick="addGoals('messi', 1, 'Tester')">+1 Logo (LM10)</button>
+    <button class="btn-lm10" onclick="addGoals('messi', 10, 'Tester')">+10 LM10</button>
     <button style="background:#475569; color:#fff;" onclick="resetMatch()">Reset</button>
   </div>
 
   <script>
     const START_RONALDO = 979;
     const START_MESSI = 928;
-    const GOAL_TARGET = 1000;
+    const TARGET = 1000;
 
-    let ronaldoScore = START_RONALDO;
-    let messiScore = START_MESSI;
-    let matchActive = true;
+    let cr7 = START_RONALDO;
+    let lm10 = START_MESSI;
+    let active = true;
 
     function addGoals(player, amount, username, avatarUrl) {
-      if (!matchActive) return;
+      if (!active) return;
 
       if (player === 'ronaldo') {
-        ronaldoScore = Math.min(GOAL_TARGET, ronaldoScore + amount);
-        document.getElementById('ronaldo-counter').innerText = `${ronaldoScore}/${GOAL_TARGET}`;
+        cr7 = Math.min(TARGET, cr7 + amount);
+        updateUI('ronaldo');
         spawnAlert('ronaldo', amount, username, avatarUrl);
-        if (ronaldoScore >= GOAL_TARGET) triggerVictory('RONALDO');
+        if (cr7 >= TARGET) triggerWin('RONALDO');
       } else {
-        messiScore = Math.min(GOAL_TARGET, messiScore + amount);
-        document.getElementById('messi-counter').innerText = `${messiScore}/${GOAL_TARGET}`;
+        lm10 = Math.min(TARGET, lm10 + amount);
+        updateUI('messi');
         spawnAlert('messi', amount, username, avatarUrl);
-        if (messiScore >= GOAL_TARGET) triggerVictory('MESSI');
+        if (lm10 >= TARGET) triggerWin('MESSI');
+      }
+    }
+
+    function updateUI(player) {
+      if (player === 'ronaldo') {
+        document.getElementById('ronaldo-score-text').innerText = `${cr7}/${TARGET}`;
+        const pct = ((cr7 / TARGET) * 100).toFixed(1);
+        document.getElementById('ronaldo-pct-text').innerText = `${pct}%`;
+        document.getElementById('ronaldo-bar').style.width = `${pct}%`;
+      } else {
+        document.getElementById('messi-score-text').innerText = `${lm10}/${TARGET}`;
+        const pct = ((lm10 / TARGET) * 100).toFixed(1);
+        document.getElementById('messi-pct-text').innerText = `${pct}%`;
+        document.getElementById('messi-bar').style.width = `${pct}%`;
       }
     }
 
     function spawnAlert(player, amount, username, avatarUrl) {
+      const container = document.getElementById(player === 'ronaldo' ? 'ronaldo-half' : 'messi-half');
       const popup = document.createElement('div');
-      popup.className = `goal-popup ${player === 'ronaldo' ? 'popup-ronaldo' : 'popup-messi'}`;
+      popup.className = `goal-popup ${player === 'ronaldo' ? 'popup-cr7' : 'popup-lm10'}`;
 
-      const imgHtml = avatarUrl ? `<img src="${avatarUrl}">` : '⚽';
-      popup.innerHTML = `${imgHtml} <span>${username} scored +${amount} GOAL${amount > 1 ? 'S' : ''}!</span>`;
+      const avatar = avatarUrl ? `<img src="${avatarUrl}">` : '⚽';
+      popup.innerHTML = `${avatar} <span>${username} +${amount} GOAL${amount > 1 ? 'S' : ''}!</span>`;
 
-      popup.style.left = `${25 + Math.random() * 40}%`;
-      popup.style.top = player === 'ronaldo' ? `${18 + Math.random() * 15}%` : `${68 + Math.random() * 15}%`;
+      popup.style.left = `${30 + Math.random() * 30}%`;
+      popup.style.top = `${35 + Math.random() * 25}%`;
 
-      document.body.appendChild(popup);
+      container.appendChild(popup);
       setTimeout(() => popup.remove(), 1800);
     }
 
-    function triggerVictory(winner) {
-      matchActive = false;
+    function triggerWin(winner) {
+      active = false;
       const banner = document.getElementById('winner-banner');
       const title = document.getElementById('winner-title');
 
       if (winner === 'RONALDO') {
         title.innerHTML = '🇵🇹 CRISTIANO RONALDO REACHED 1,000 GOALS! SIUUU! 🐐';
-        title.style.color = '#facc15';
-        banner.style.borderColor = '#facc15';
+        title.style.color = '#ffe600';
+        banner.style.borderColor = '#ffe600';
       } else {
-        title.innerHTML = '🇦🇷 LIONEL MESSI REACHED 1,000 GOALS! GOAT! 🐐';
+        title.innerHTML = '🇦🇷 LIONEL MESSI REACHED 1,000 GOALS! ANKARA MESSI! 🐐';
         title.style.color = '#f472b6';
         banner.style.borderColor = '#f472b6';
       }
@@ -288,11 +550,11 @@
     function resetMatch() {
       const banner = document.getElementById('winner-banner');
       banner.style.transform = 'translate(-50%, -50%) scale(0)';
-      ronaldoScore = START_RONALDO;
-      messiScore = START_MESSI;
-      document.getElementById('ronaldo-counter').innerText = `${ronaldoScore}/${GOAL_TARGET}`;
-      document.getElementById('messi-counter').innerText = `${messiScore}/${GOAL_TARGET}`;
-      matchActive = true;
+      cr7 = START_RONALDO;
+      lm10 = START_MESSI;
+      updateUI('ronaldo');
+      updateUI('messi');
+      active = true;
     }
 
     window.toggleTestPanel = function() {
@@ -300,7 +562,7 @@
       p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
     };
 
-    // --- WEBSOCKET EVENT LISTENER ---
+    // --- WEBSOCKET LISTENER ---
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const socket = new WebSocket(`${protocol}//${window.location.host}`);
 
@@ -311,10 +573,10 @@
         const coins = data.diamondCount || 1;
         const player = gift.includes('rose') ? 'ronaldo' : 'messi';
 
-        let addedGoals = coins;
-        if (coins >= 1000) addedGoals = 1000;
+        let added = coins;
+        if (coins >= 1000) added = 1000;
 
-        addGoals(player, addedGoals, data.username, data.avatar);
+        addGoals(player, added, data.username, data.avatar);
       }
     };
   </script>
