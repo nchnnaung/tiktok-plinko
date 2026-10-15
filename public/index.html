@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>TikTok Plinko Live</title>
+  <title>TikTok Tug of War Live</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -11,289 +11,407 @@
       background: #0b0c16;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      user-select: none;
     }
-    #canvas-box { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-    /* --- SIDEBAR CONTAINERS (TUCKED INTO EMPTY SHOULDER SPACE) --- */
-    .rules-sidebar {
-      position: absolute;
-      top: 60px; /* Starts high where the peg pyramid is narrowest */
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      z-index: 50;
-      pointer-events: none;
+    /* Secret tap area to reveal testing buttons */
+    #secret-tap-zone {
+      position: absolute; top: 0; left: 0; width: 100%; height: 70px; z-index: 100;
     }
-    #rules-left { left: 10px; }
-    #rules-right { right: 10px; }
 
-    /* --- 3X JUMBO CARD STYLING --- */
-    .rule-card {
-      width: 142px;
-      background: rgba(11, 15, 30, 0.95);
-      border-radius: 20px;
-      padding: 12px 6px;
+    /* --- TOP HEADER & RULES --- */
+    #top-bar {
+      position: absolute; top: 20px; left: 0; width: 100%;
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 0 16px; z-index: 50; pointer-events: none;
+    }
+
+    .team-card {
+      width: 140px;
+      padding: 12px 8px;
+      border-radius: 16px;
       text-align: center;
-      color: #ffffff;
-      backdrop-filter: blur(6px);
+      color: white;
+      backdrop-filter: blur(8px);
+    }
+    .red-card {
+      background: rgba(239, 68, 68, 0.15);
+      border: 3px solid #ef4444;
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+    }
+    .blue-card {
+      background: rgba(56, 189, 248, 0.15);
+      border: 3px solid #38bdf8;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
     }
 
-    /* Left Side: Intense Cyan Glow */
-    .card-blue {
-      border: 3.5px solid #38bdf8;
-      box-shadow: 0 0 22px rgba(56, 189, 248, 0.55), inset 0 0 12px rgba(56, 189, 248, 0.2);
-    }
-    .badge-blue {
-      background: #0284c7;
-      color: #ffffff;
-    }
-    .ball-blue {
-      color: #38bdf8;
-      text-shadow: 0 0 10px rgba(56, 189, 248, 0.9);
-    }
+    .team-title { font-size: 14px; font-weight: 900; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .red-title { color: #f87171; text-shadow: 0 0 8px rgba(239, 68, 68, 0.8); }
+    .blue-title { color: #38bdf8; text-shadow: 0 0 8px rgba(56, 189, 248, 0.8); }
 
-    /* Right Side: Intense Gold Glow */
-    .card-gold {
-      border: 3.5px solid #f59e0b;
-      box-shadow: 0 0 22px rgba(245, 158, 11, 0.55), inset 0 0 12px rgba(245, 158, 11, 0.2);
-    }
-    .badge-gold {
-      background: #d97706;
-      color: #ffffff;
-    }
-    .ball-gold {
-      color: #fbbf24;
-      text-shadow: 0 0 10px rgba(245, 158, 11, 0.9);
-    }
+    .team-gift { font-size: 38px; line-height: 1.1; margin: 2px 0; }
+    .team-action { font-size: 12px; font-weight: 800; color: #cbd5e1; }
+    .team-score { font-size: 24px; font-weight: 900; margin-top: 4px; }
 
-    /* Jumbo Typography & Icons */
-    .tier-badge {
-      font-size: 13px;
-      font-weight: 900;
-      letter-spacing: 1px;
-      padding: 4px 10px;
-      border-radius: 8px;
-      display: inline-block;
-      margin-bottom: 4px;
-      text-transform: uppercase;
+    #timer-box {
+      background: rgba(15, 23, 42, 0.9);
+      border: 2px solid #64748b;
+      border-radius: 12px;
+      padding: 8px 16px;
+      text-align: center;
+      color: white;
     }
-    .gift-icon {
-      font-size: 52px; /* 3x Bigger Icon */
-      line-height: 1.1;
-      margin: 4px 0 2px 0;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
-    }
-    .gift-name {
-      font-size: 16px; /* Bigger Font */
-      font-weight: 800;
-      color: #f1f5f9;
-    }
-    .arrow {
-      font-size: 14px;
-      color: #64748b;
-      margin: 2px 0;
-    }
-    .ball-count {
-      font-size: 22px; /* 3x Bigger Outcome */
-      font-weight: 900;
-      letter-spacing: 0.5px;
-    }
+    #timer-label { font-size: 10px; color: #94a3b8; font-weight: bold; letter-spacing: 1px; }
+    #timer-display { font-size: 24px; font-weight: 900; color: #f59e0b; }
 
-    /* Hidden testing buttons */
+    /* --- TENSION PROGRESS BAR --- */
+    #meter-container {
+      position: absolute; top: 175px; left: 5%; width: 90%; height: 26px;
+      background: #1e293b; border-radius: 13px; overflow: hidden;
+      display: flex; border: 2px solid #334155; z-index: 40;
+    }
+    #red-meter { width: 50%; height: 100%; background: linear-gradient(90deg, #b91c1c, #ef4444); transition: width 0.2s ease; }
+    #blue-meter { width: 50%; height: 100%; background: linear-gradient(90deg, #0284c7, #38bdf8); transition: width 0.2s ease; }
+
+    /* Canvas */
+    #game-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+    /* Winner Popup */
+    #winner-banner {
+      position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) scale(0);
+      background: rgba(15, 23, 42, 0.95); padding: 24px 32px; border-radius: 24px;
+      text-align: center; color: white; z-index: 200; border: 4px solid #f59e0b;
+      box-shadow: 0 0 40px rgba(245, 158, 11, 0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    #winner-title { font-size: 32px; font-weight: 900; margin-bottom: 8px; }
+    #winner-sub { font-size: 16px; color: #94a3b8; }
+
+    /* Hidden Testing Panel */
     #test-panel {
-      position: absolute; bottom: 15px; left: 15px; z-index: 100;
-      display: none; gap: 8px; background: rgba(0,0,0,0.7); padding: 8px; border-radius: 8px;
+      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+      display: none; gap: 8px; background: rgba(0,0,0,0.85); padding: 10px;
+      border-radius: 12px; z-index: 100;
     }
     button {
-      background: #38bdf8; border: none; padding: 7px 10px;
-      border-radius: 5px; font-weight: bold; cursor: pointer; color: #000; font-size: 11px;
+      border: none; padding: 8px 12px; border-radius: 6px;
+      font-weight: 900; cursor: pointer; font-size: 11px;
     }
-
-    /* Secret tap area at top of screen to show/hide test buttons */
-    #secret-tap-zone {
-      position: absolute; top: 0; left: 0; width: 100%; height: 60px; z-index: 60;
-    }
+    .btn-red { background: #ef4444; color: white; }
+    .btn-blue { background: #38bdf8; color: black; }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
 <body>
-  <!-- Secret Tap Zone to toggle test buttons -->
   <div id="secret-tap-zone" onclick="toggleTestPanel()"></div>
 
-  <!-- LEFT SIDE: Basic & Multi-Drop -->
-  <div class="rules-sidebar" id="rules-left">
-    <div class="rule-card card-blue">
-      <div class="tier-badge badge-blue">BASIC</div>
-      <div class="gift-icon">🌹</div>
-      <div class="gift-name">1 Rose</div>
-      <div class="arrow">▼</div>
-      <div class="ball-count ball-blue">1 BALL</div>
+  <!-- Header -->
+  <div id="top-bar">
+    <div class="team-card red-card">
+      <div class="team-title red-title">TEAM RED</div>
+      <div class="team-gift">🌹</div>
+      <div class="team-action">Rose = Pull Left</div>
+      <div class="team-score" id="red-score">0</div>
     </div>
-    <div class="rule-card card-blue">
-      <div class="tier-badge badge-blue">MULTI-DROP</div>
-      <div class="gift-icon">🍩</div>
-      <div class="gift-name">30 Coins</div>
-      <div class="arrow">▼</div>
-      <div class="ball-count ball-blue">5 BALLS</div>
+
+    <div id="timer-box">
+      <div id="timer-label">ROUND TIME</div>
+      <div id="timer-display">02:00</div>
+    </div>
+
+    <div class="team-card blue-card">
+      <div class="team-title blue-title">TEAM BLUE</div>
+      <div class="team-gift">🍩</div>
+      <div class="team-action">Other = Pull Right</div>
+      <div class="team-score" id="blue-score">0</div>
     </div>
   </div>
 
-  <!-- RIGHT SIDE: Epic & Legendary -->
-  <div class="rules-sidebar" id="rules-right">
-    <div class="rule-card card-gold">
-      <div class="tier-badge badge-gold">EPIC TIER</div>
-      <div class="gift-icon">🎉</div>
-      <div class="gift-name">100 Coins</div>
-      <div class="arrow">▼</div>
-      <div class="ball-count ball-gold">15 BALLS</div>
-    </div>
-    <div class="rule-card card-gold">
-      <div class="tier-badge badge-gold">LEGENDARY</div>
-      <div class="gift-icon">🦁</div>
-      <div class="gift-name">1000+ Coins</div>
-      <div class="arrow">▼</div>
-      <div class="ball-count ball-gold">150 BALLS</div>
-    </div>
+  <!-- Tension Meter -->
+  <div id="meter-container">
+    <div id="red-meter"></div>
+    <div id="blue-meter"></div>
   </div>
 
-  <div id="canvas-box"></div>
+  <canvas id="game-canvas"></canvas>
 
+  <!-- Victory Banner -->
+  <div id="winner-banner">
+    <div id="winner-title">🏆 TEAM RED WINS!</div>
+    <div id="winner-sub">Next round starting in 5 seconds...</div>
+  </div>
+
+  <!-- Hidden Test Controls -->
   <div id="test-panel">
-    <button onclick="testDrop(1)">Test 1</button>
-    <button onclick="testDrop(30)">Test 30</button>
-    <button onclick="testDrop(100)">Test 100</button>
-    <button onclick="testDrop(1000)">Test 150</button>
+    <button class="btn-red" onclick="testPull('red', 1)">+1 Red (Rose)</button>
+    <button class="btn-red" onclick="testPull('red', 15)">+15 Red</button>
+    <button class="btn-blue" onclick="testPull('blue', 1)">+1 Blue</button>
+    <button class="btn-blue" onclick="testPull('blue', 15)">+15 Blue</button>
+    <button style="background:#64748b; color:white;" onclick="resetRound()">Reset</button>
   </div>
 
   <script>
-    const { Engine, Render, Runner, Bodies, Composite, Events } = Matter;
-    const width = 1080;
-    const height = 1920;
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
 
-    const engine = Engine.create({ gravity: { y: 1.2 } });
-    const world = engine.world;
+    const WIDTH = 1080;
+    const HEIGHT = 1920;
+    canvas.width = WIDTH;
+    canvas.height = HEIGHT;
 
-    const render = Render.create({
-      element: document.getElementById('canvas-box'),
-      engine: engine,
-      options: { width: width, height: height, wireframes: false, background: '#0b0c16' }
-    });
+    // Game State
+    let ropeX = WIDTH / 2;
+    let targetRopeX = WIDTH / 2;
+    const ropeY = HEIGHT * 0.58;
+    const maxOffset = 380; // Distance to win boundary
+    const minX = (WIDTH / 2) - maxOffset;
+    const maxX = (WIDTH / 2) + maxOffset;
 
-    Render.run(render);
-    Runner.run(Runner.create(), engine);
+    let redWins = 0;
+    let blueWins = 0;
+    let roundActive = true;
+    let roundTime = 120; // 2 minutes
 
-    // Boundary walls
-    Composite.add(world, [
-      Bodies.rectangle(-10, height / 2, 20, height, { isStatic: true }),
-      Bodies.rectangle(width + 10, height / 2, 20, height, { isStatic: true })
-    ]);
+    const pullers = []; // Animated avatar entities
 
-    // Peg Matrix
-    const rows = 11;
-    const startY = 350;
-    const spacingY = 85;
+    // --- GAME LOOP ---
+    function update() {
+      // Smooth rope slide
+      ropeX += (targetRopeX - ropeX) * 0.12;
 
-    for (let r = 0; r < rows; r++) {
-      const count = r + 3;
-      const spacingX = 75;
-      const startX = (width - (count - 1) * spacingX) / 2;
+      // Update tension meter bar
+      const redPercent = Math.max(5, Math.min(95, ((maxX - ropeX) / (maxOffset * 2)) * 100));
+      document.getElementById('red-meter').style.width = `${redPercent}%`;
+      document.getElementById('blue-meter').style.width = `${100 - redPercent}%`;
 
-      for (let c = 0; c < count; c++) {
-        Composite.add(world, Bodies.circle(startX + c * spacingX, startY + r * spacingY, 10, {
-          isStatic: true,
-          restitution: 0.8,
-          render: { fillStyle: '#38bdf8' }
-        }));
-      }
-    }
-
-    // Bottom Multipliers
-    const mults = [50, 10, 2, 0.5, 2, 10, 50];
-    const binW = width / mults.length;
-    const binY = 1600;
-
-    mults.forEach((m, i) => {
-      if (i > 0) {
-        Composite.add(world, Bodies.rectangle(i * binW, binY - 30, 8, 120, {
-          isStatic: true,
-          render: { fillStyle: '#334155' }
-        }));
-      }
-      const sensor = Bodies.rectangle(i * binW + binW / 2, binY + 40, binW - 8, 48, {
-        isStatic: true,
-        isSensor: true,
-        label: 'sensor',
-        render: { fillStyle: m >= 10 ? '#ef4444' : (m >= 2 ? '#f59e0b' : '#10b981') }
-      });
-      Composite.add(world, sensor);
-    });
-
-    Events.on(render, 'afterRender', () => {
-      const ctx = render.context;
-      ctx.font = 'bold 36px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#ffffff';
-
-      mults.forEach((m, i) => {
-        const x = i * binW + binW / 2;
-        const y = binY + 40;
-        ctx.fillText(`${m}x`, x, y);
-      });
-    });
-
-    Events.on(engine, 'collisionStart', (e) => {
-      e.pairs.forEach(({ bodyA, bodyB }) => {
-        const ball = bodyA.label === 'ball' ? bodyA : (bodyB.label === 'ball' ? bodyB : null);
-        const sensor = bodyA.label === 'sensor' ? bodyA : (bodyB.label === 'sensor' ? bodyB : null);
-        if (ball && sensor && !ball.consumed) {
-          ball.consumed = true;
-          setTimeout(() => Composite.remove(world, ball), 100);
+      // Check boundary wins
+      if (roundActive) {
+        if (ropeX <= minX + 15) {
+          endRound('RED');
+        } else if (ropeX >= maxX - 15) {
+          endRound('BLUE');
         }
-      });
-    });
+      }
 
-    function dropAvatar(name, avatarUrl, coins) {
-      let count = 1;
-      if (coins >= 1000) count = 150;
-      else if (coins >= 100) count = 15;
-      else if (coins >= 30) count = 5;
-      else count = 1;
+      render();
+      requestAnimationFrame(update);
+    }
 
-      for (let i = 0; i < count; i++) {
-        setTimeout(() => {
-          const x = (width / 2) + (Math.random() * 80 - 40);
-          const ball = Bodies.circle(x, 100, 26, {
-            restitution: 0.7,
-            friction: 0.05,
-            label: 'ball',
-            render: avatarUrl ? {
-              sprite: { texture: avatarUrl, xScale: 0.5, yScale: 0.5 }
-            } : { fillStyle: '#f59e0b' }
-          });
-          Composite.add(world, ball);
-        }, i * 150);
+    function render() {
+      ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+      // --- Draw Center Line & Goal Markers ---
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.setLineDash([12, 12]);
+      ctx.beginPath();
+      ctx.moveTo(WIDTH / 2, 220);
+      ctx.lineTo(WIDTH / 2, HEIGHT - 100);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Red Goal Line
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(minX, ropeY - 140);
+      ctx.lineTo(minX, ropeY + 140);
+      ctx.stroke();
+
+      // Blue Goal Line
+      ctx.strokeStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.moveTo(maxX, ropeY - 140);
+      ctx.lineTo(maxX, ropeY + 140);
+      ctx.stroke();
+
+      // --- Draw The Rope ---
+      ctx.lineWidth = 20;
+      ctx.strokeStyle = '#78350f';
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(minX - 100, ropeY);
+      ctx.lineTo(maxX + 100, ropeY);
+      ctx.stroke();
+
+      // Glowing Center Energy Core / Flag
+      ctx.save();
+      ctx.shadowBlur = 30;
+      ctx.shadowColor = ropeX < WIDTH / 2 ? '#ef4444' : '#38bdf8';
+      ctx.fillStyle = ropeX < WIDTH / 2 ? '#ef4444' : '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(ropeX, ropeY, 32, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Center marker knot
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(ropeX, ropeY, 14, 0, Math.PI * 2);
+      ctx.fill();
+
+      // --- Draw Active Pullers (Avatars) ---
+      for (let i = pullers.length - 1; i >= 0; i--) {
+        const p = pullers[i];
+        p.y += p.vy;
+        p.life -= 0.015;
+
+        if (p.life <= 0) {
+          pullers.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, p.life * 2);
+
+        // Pulling connecting line to rope
+        ctx.strokeStyle = p.team === 'red' ? 'rgba(239, 68, 68, 0.4)' : 'rgba(56, 189, 248, 0.4)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.anchorX, ropeY);
+        ctx.stroke();
+
+        // Avatar Circle
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.team === 'red' ? '#ef4444' : '#38bdf8';
+        ctx.fill();
+
+        if (p.img && p.img.complete) {
+          ctx.save();
+          ctx.clip();
+          ctx.drawImage(p.img, p.x - p.radius, p.y - p.radius, p.radius * 2, p.radius * 2);
+          ctx.restore();
+        }
+
+        // Border
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = p.team === 'red' ? '#ef4444' : '#38bdf8';
+        ctx.stroke();
+
+        // Username
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(p.name, p.x, p.y - p.radius - 8);
+
+        ctx.restore();
       }
     }
 
+    // --- PULL LOGIC ---
+    function triggerPull(team, coins, name, avatarUrl) {
+      if (!roundActive) return;
+
+      const pullPower = Math.min(180, 8 * coins); // Scale pull distance
+      if (team === 'red') {
+        targetRopeX = Math.max(minX, targetRopeX - pullPower);
+      } else {
+        targetRopeX = Math.min(maxX, targetRopeX + pullPower);
+      }
+
+      // Spawn visual pulling avatar
+      const anchorX = team === 'red' ? ropeX - 70 : ropeX + 70;
+      const spawnX = team === 'red' ? anchorX - 80 - Math.random() * 80 : anchorX + 80 + Math.random() * 80;
+      const spawnY = ropeY + (Math.random() * 120 - 60);
+
+      const puller = {
+        team: team,
+        name: name,
+        x: spawnX,
+        y: spawnY,
+        anchorX: anchorX,
+        vy: -0.6,
+        radius: coins >= 100 ? 44 : 32,
+        life: 1.0,
+        img: null
+      };
+
+      if (avatarUrl) {
+        puller.img = new Image();
+        puller.img.src = avatarUrl;
+      }
+
+      pullers.push(puller);
+    }
+
+    // --- ROUND RESOLUTION ---
+    function endRound(winner) {
+      roundActive = false;
+      const banner = document.getElementById('winner-banner');
+      const title = document.getElementById('winner-title');
+
+      if (winner === 'RED') {
+        redWins++;
+        document.getElementById('red-score').innerText = redWins;
+        title.innerHTML = '🏆 TEAM RED WINS! 🌹';
+        title.style.color = '#ef4444';
+        banner.style.borderColor = '#ef4444';
+      } else {
+        blueWins++;
+        document.getElementById('blue-score').innerText = blueWins;
+        title.innerHTML = '🏆 TEAM BLUE WINS! 🍩';
+        title.style.color = '#38bdf8';
+        banner.style.borderColor = '#38bdf8';
+      }
+
+      banner.style.transform = 'translate(-50%, -50%) scale(1)';
+
+      setTimeout(() => {
+        resetRound();
+      }, 5000);
+    }
+
+    function resetRound() {
+      const banner = document.getElementById('winner-banner');
+      banner.style.transform = 'translate(-50%, -50%) scale(0)';
+      targetRopeX = WIDTH / 2;
+      ropeX = WIDTH / 2;
+      pullers.length = 0;
+      roundTime = 120;
+      roundActive = true;
+    }
+
+    // --- TIMER COUNTDOWN ---
+    setInterval(() => {
+      if (!roundActive) return;
+      if (roundTime > 0) {
+        roundTime--;
+        const mins = String(Math.floor(roundTime / 60)).padStart(2, '0');
+        const secs = String(roundTime % 60).padStart(2, '0');
+        document.getElementById('timer-display').innerText = `${mins}:${secs}`;
+      } else {
+        // Time expired: closest to their side wins
+        if (ropeX < WIDTH / 2) endRound('RED');
+        else if (ropeX > WIDTH / 2) endRound('BLUE');
+        else resetRound();
+      }
+    }, 1000);
+
+    // Hidden Controls
     window.toggleTestPanel = function() {
-      const panel = document.getElementById('test-panel');
-      panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
+      const p = document.getElementById('test-panel');
+      p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
     };
 
-    window.testDrop = function(coins) {
-      dropAvatar("Tester", null, coins);
+    window.testPull = function(team, coins) {
+      triggerPull(team, coins, team.toUpperCase(), null);
     };
 
+    // --- WEBSOCKET LISTENER ---
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const socket = new WebSocket(`${protocol}//${window.location.host}`);
 
     socket.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
       if (data.type === 'GIFT') {
-        dropAvatar(data.username, data.avatar, data.diamondCount);
+        const gift = (data.giftName || '').toLowerCase();
+        // If gift contains "rose", goes to Team Red. Any other gift goes to Team Blue!
+        const team = gift.includes('rose') ? 'red' : 'blue';
+        triggerPull(team, data.diamondCount || 1, data.username, data.avatar);
       }
     };
+
+    update();
   </script>
 </body>
 </html>
