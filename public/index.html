@@ -7,8 +7,37 @@
   <style>
     body { margin: 0; background: #0b0c16; overflow: hidden; font-family: sans-serif; }
     #canvas-box { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-    
-    /* Hidden by default; only shows when toggled */
+
+    /* On-Screen Gift Rules Banner */
+    #gift-banner {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      background: rgba(18, 20, 38, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 30px;
+      padding: 10px 18px;
+      z-index: 50;
+      pointer-events: none;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    }
+    .rule-tag {
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+    .rule-tag span {
+      color: #38bdf8;
+    }
+
+    /* Hidden by default; tap top area to toggle */
     #test-panel {
       position: absolute; bottom: 20px; left: 20px; z-index: 100;
       display: none; gap: 10px; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 8px;
@@ -18,16 +47,23 @@
       border-radius: 6px; font-weight: bold; cursor: pointer; color: #000;
     }
 
-    /* Invisible secret tap zone at the top of the screen */
+    /* Secret tap zone */
     #secret-tap-zone {
-      position: absolute; top: 0; left: 0; width: 100%; height: 80px; z-index: 200;
+      position: absolute; top: 0; left: 0; width: 100%; height: 70px; z-index: 60;
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
 <body>
-  <!-- Tap here to show/hide the test buttons -->
+  <!-- Secret Tap Zone to show/hide test buttons -->
   <div id="secret-tap-zone" onclick="toggleTestPanel()"></div>
+
+  <!-- Viewer Live Gift Rules -->
+  <div id="gift-banner">
+    <div class="rule-tag">🌹 1 Rose = <span>1 Ball</span></div>
+    <div class="rule-tag">🍩 30 = <span>5 Balls</span></div>
+    <div class="rule-tag">🎉 100 = <span>15 Balls</span></div>
+  </div>
 
   <div id="canvas-box"></div>
 
@@ -123,7 +159,11 @@
     });
 
     function dropAvatar(name, avatarUrl, coins) {
-      const count = coins >= 100 ? 15 : (coins >= 30 ? 5 : 1);
+      let count = 1;
+      if (coins >= 100) count = 15;
+      else if (coins >= 30) count = 5;
+      else count = 1;
+
       for (let i = 0; i < count; i++) {
         setTimeout(() => {
           const x = (width / 2) + (Math.random() * 80 - 40);
@@ -140,7 +180,6 @@
       }
     }
 
-    // Toggle Secret Function
     window.toggleTestPanel = function() {
       const panel = document.getElementById('test-panel');
       panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
