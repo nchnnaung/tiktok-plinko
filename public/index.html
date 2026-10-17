@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#110d2e">
-  <title>Feed the Chonky Cat Live</title>
+  <meta name="theme-color" content="#d9d9df">
+  <title>3Hands - Live Plotter Engraver</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #110d2e;
+      background: #c8c8cf;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       user-select: none;
@@ -19,355 +18,102 @@
       width: 100vw;
     }
 
-    /* Secret tap area at top of screen to show/hide testing buttons */
     #secret-tap-zone {
-      position: absolute; top: 0; left: 0; width: 100%; height: 50px; z-index: 100;
+      position: absolute; top: 0; left: 0; width: 100%; height: 60px; z-index: 100;
     }
 
     #game-canvas {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     }
 
-    /* --- TOP PROGRESS & STATS HUD --- */
-    #top-hud {
-      position: absolute; top: 14px; left: 0; width: 100%;
-      display: flex; flex-direction: column; align-items: center;
-      gap: 6px; z-index: 50; pointer-events: none; padding: 0 16px;
+    /* --- TOP BRANDING & GIFT TIERS HUD --- */
+    #top-bar {
+      position: absolute; top: 18px; left: 0; width: 100%;
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 0 16px; z-index: 50; pointer-events: none;
     }
 
-    .level-badge {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: 1px;
-      padding: 4px 16px;
-      border-radius: 20px;
-      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5);
-      border: 2px solid #fef3c7;
-    }
-
-    .bar-container {
-      width: 92%;
-      height: 22px;
-      background: rgba(15, 23, 42, 0.85);
-      border-radius: 14px;
-      border: 2.5px solid #f472b6;
-      box-shadow: 0 0 16px rgba(244, 114, 182, 0.4);
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .bar-fill {
-      position: absolute; left: 0; top: 0; bottom: 0;
-      width: 15%;
-      background: linear-gradient(90deg, #ec4899, #f472b6);
-      border-radius: 10px;
-      transition: width 0.3s ease-out;
-    }
-    .bar-text {
-      position: relative; z-index: 2;
-      font-size: 11px; font-weight: 900; color: #ffffff;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-      letter-spacing: 0.5px;
-    }
-
-    #recent-feed-toast {
-      background: rgba(15, 23, 42, 0.95);
-      border: 1.5px solid #38bdf8;
-      border-radius: 20px;
-      padding: 3px 12px;
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.7);
-      opacity: 0;
-      transform: translateY(-8px);
-      transition: all 0.3s ease;
-    }
-    #recent-feed-toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* --- SIDEBAR GIFT MENUS --- */
-    #rules-left {
-      position: absolute; top: 90px; left: 10px;
-      display: flex; flex-direction: column; gap: 7px; z-index: 50; pointer-events: none;
-    }
-    #rules-right {
-      position: absolute; top: 90px; right: 10px;
-      display: flex; flex-direction: column; gap: 7px; z-index: 50; pointer-events: none;
-    }
-
-    .gift-chip {
-      background: rgba(15, 23, 42, 0.92);
-      border-radius: 14px;
-      padding: 5px 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #ffffff;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.7);
-      backdrop-filter: blur(6px);
-      border: 1.5px solid;
-    }
-    .chip-pink { border-color: #f472b6; box-shadow: 0 0 10px rgba(244, 114, 182, 0.3); }
-    .chip-gold { border-color: #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
-
-    .chip-icon { font-size: 22px; line-height: 1; }
-    .chip-name { font-size: 10px; font-weight: 800; color: #cbd5e1; }
-    .chip-action { font-size: 11px; font-weight: 900; }
-    .text-pink { color: #f472b6; }
-    .text-gold { color: #f59e0b; }
-
-    /* --- BOTTOM: TOP 3 FEEDERS LEADERBOARD --- */
-    #feeders-panel {
-      position: absolute;
-      bottom: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 94%;
-      max-width: 480px;
-      background: rgba(15, 23, 42, 0.94);
-      border: 2px solid #f59e0b;
-      box-shadow: 0 0 24px rgba(245, 158, 11, 0.35);
-      border-radius: 20px;
-      padding: 10px 14px;
-      z-index: 50;
-      backdrop-filter: blur(10px);
-      pointer-events: none;
-    }
-
-    .feeders-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-      padding-bottom: 4px;
-    }
-    .feeders-title {
-      font-size: 12px;
-      font-weight: 900;
-      color: #f59e0b;
-      letter-spacing: 0.5px;
-    }
-    .feeders-subtitle {
-      font-size: 10px;
-      font-weight: 700;
-      color: #94a3b8;
-    }
-
-    .feeders-list {
-      display: flex;
-      gap: 8px;
-      justify-content: space-between;
-    }
-
-    .feeder-card {
-      flex: 1;
-      background: rgba(30, 41, 59, 0.8);
+    .brand-box {
+      background: rgba(255, 255, 255, 0.9);
       border-radius: 12px;
-      padding: 6px 4px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      border: 1.5px solid transparent;
-      transition: all 0.3s ease;
+      padding: 6px 14px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    .brand-title {
+      font-size: 16px; font-weight: 900; color: #1e293b; letter-spacing: 0.5px;
+    }
+    .brand-sub {
+      font-size: 10px; font-weight: 700; color: #64748b;
     }
 
-    .rank-1 {
-      border-color: #f59e0b;
-      background: rgba(245, 158, 11, 0.12);
-      box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+    .live-counter-pill {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      padding: 6px 14px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+      text-align: right;
     }
-    .rank-2 {
-      border-color: #94a3b8;
-      background: rgba(148, 163, 184, 0.1);
-    }
-    .rank-3 {
-      border-color: #d97706;
-      background: rgba(217, 119, 6, 0.1);
-    }
+    .counter-title { font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; }
+    .counter-num { font-size: 16px; font-weight: 900; color: #2563eb; }
 
-    .feeder-avatar-box {
-      position: relative;
-      width: 36px;
-      height: 36px;
-      margin-bottom: 3px;
+    /* Bottom Gift Badges Guide */
+    #gift-guide {
+      position: absolute; bottom: 20px; right: 16px;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 14px; padding: 8px 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      z-index: 50; pointer-events: none;
+      display: flex; flex-direction: column; gap: 4px;
     }
-    .feeder-pfp {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      border: 2px solid #ffffff;
-      object-fit: cover;
-      background: #0f172a;
+    .guide-tag {
+      font-size: 11px; font-weight: 900; color: #1e293b; display: flex; align-items: center; gap: 6px;
     }
-    .rank-crown {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      font-size: 14px;
-      line-height: 1;
-    }
+    .guide-tag span { color: #2563eb; }
 
-    .feeder-username {
-      font-size: 11px;
-      font-weight: 800;
-      color: #ffffff;
-      max-width: 95px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .feeder-treats {
-      font-size: 10px;
-      font-weight: 900;
-      color: #f472b6;
-      margin-top: 1px;
-    }
-
-    /* Celebration Banner */
-    #celebrate-banner {
-      position: absolute; top: 44%; left: 50%; transform: translate(-50%, -50%) scale(0);
-      background: rgba(15, 23, 42, 0.98); padding: 26px 22px; border-radius: 26px;
-      text-align: center; color: white; z-index: 200;
-      box-shadow: 0 0 60px rgba(245, 158, 11, 0.8);
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      border: 4px solid #f59e0b; width: 88%;
-    }
-    #celebrate-title { font-size: 28px; font-weight: 900; color: #f59e0b; margin-bottom: 6px; }
-    #celebrate-sub { font-size: 15px; color: #cbd5e1; }
-
-    /* Testing controls (Hidden by default, tap top of screen to toggle) */
+    /* Offline Secret Test Panel */
     #test-panel {
-      position: absolute; bottom: 125px; left: 50%; transform: translateX(-50%);
-      display: none; gap: 6px; background: rgba(0,0,0,0.92); padding: 8px 10px;
-      border-radius: 14px; z-index: 150; width: 92%; max-width: 460px;
-      flex-wrap: wrap; justify-content: center;
+      position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%);
+      display: none; gap: 6px; background: rgba(15, 23, 42, 0.95); padding: 8px 12px;
+      border-radius: 12px; z-index: 150;
     }
     button {
-      border: none; padding: 6px 10px; border-radius: 6px;
+      border: none; padding: 7px 11px; border-radius: 6px;
       font-weight: 900; cursor: pointer; font-size: 11px;
     }
     .btn-fs { background: #22c55e; color: #000; }
-    .btn-snack { background: #f472b6; color: #000; }
-    .btn-feast { background: #f59e0b; color: #000; }
+    .btn-print { background: #38bdf8; color: #000; }
   </style>
 </head>
 <body>
-  <!-- Secret Tap Zone at top to show/hide testing buttons -->
+  <!-- Secret Tap Zone at top to reveal offline testing controls -->
   <div id="secret-tap-zone" onclick="toggleTestPanel()"></div>
 
-  <!-- Top HUD -->
-  <div id="top-hud">
-    <div class="level-badge" id="cat-level-badge">🐱 LEVEL 1: CUTE CHONK</div>
-    <div class="bar-container">
-      <div class="bar-fill" id="food-bar" style="width: 15%;"></div>
-      <div class="bar-text" id="food-bar-text">30 / 200 TREATS (15%)</div>
+  <div id="top-bar">
+    <div class="brand-box">
+      <div class="brand-title">3Hands Studio ✍️</div>
+      <div class="brand-sub">Automated CNC Portrait Plotter</div>
     </div>
-    <div id="recent-feed-toast">
-      <span>💖</span>
-      <span id="recent-toast-text">Waiting for first treat...</span>
+    <div class="live-counter-pill">
+      <div class="counter-title">Prints Completed</div>
+      <div class="counter-num" id="print-counter">0</div>
     </div>
   </div>
 
-  <!-- Left Gift Rules -->
-  <div id="rules-left">
-    <div class="gift-chip chip-pink">
-      <span class="chip-icon">🐟</span>
-      <div>
-        <div class="chip-name">1 Rose</div>
-        <div class="chip-action text-pink">+1 FISH</div>
-      </div>
-    </div>
-    <div class="gift-chip chip-pink">
-      <span class="chip-icon">🥛</span>
-      <div>
-        <div class="chip-name">TikTok Logo</div>
-        <div class="chip-action text-pink">+10 MILK</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Right Gift Rules -->
-  <div id="rules-right">
-    <div class="gift-chip chip-gold">
-      <span class="chip-icon">🥫</span>
-      <div>
-        <div class="chip-name">30 Coins</div>
-        <div class="chip-action text-gold">+30 TUNA</div>
-      </div>
-    </div>
-    <div class="gift-chip chip-gold">
-      <span class="chip-icon">🍗</span>
-      <div>
-        <div class="chip-name">100 Coins</div>
-        <div class="chip-action text-gold">+100 FEAST</div>
-      </div>
-    </div>
+  <div id="gift-guide">
+    <div class="guide-tag">🌹 1 Rose = <span>Classic Crest</span></div>
+    <div class="guide-tag">🍩 30 Coins = <span>Royal Gold Seal</span></div>
+    <div class="guide-tag">🎉 100 Coins = <span>Imperial Crown</span></div>
   </div>
 
   <canvas id="game-canvas"></canvas>
 
-  <!-- Bottom Top 3 Feeders Leaderboard -->
-  <div id="feeders-panel">
-    <div class="feeders-header">
-      <span class="feeders-title">🏆 TOP CHONK FEEDERS</span>
-      <span class="feeders-subtitle">Gifts Level Up Cat!</span>
-    </div>
-    <div class="feeders-list">
-      <div class="feeder-card rank-1">
-        <div class="feeder-avatar-box">
-          <img class="feeder-pfp" id="rank1-img" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png">
-          <span class="rank-crown">🥇</span>
-        </div>
-        <div class="feeder-username" id="rank1-name">---</div>
-        <div class="feeder-treats" id="rank1-treats">0 treats</div>
-      </div>
-
-      <div class="feeder-card rank-2">
-        <div class="feeder-avatar-box">
-          <img class="feeder-pfp" id="rank2-img" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png">
-          <span class="rank-crown">🥈</span>
-        </div>
-        <div class="feeder-username" id="rank2-name">---</div>
-        <div class="feeder-treats" id="rank2-treats">0 treats</div>
-      </div>
-
-      <div class="feeder-card rank-3">
-        <div class="feeder-avatar-box">
-          <img class="feeder-pfp" id="rank3-img" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png">
-          <span class="rank-crown">🥉</span>
-        </div>
-        <div class="feeder-username" id="rank3-name">---</div>
-        <div class="feeder-treats" id="rank3-treats">0 treats</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Level Up Banner -->
-  <div id="celebrate-banner">
-    <div id="celebrate-title">🎉 ULTRA CHONK REACHED!</div>
-    <div id="celebrate-sub">Cat evolved to the next level of chonkiness!</div>
-  </div>
-
-  <!-- Testing Panel (Includes Fullscreen Button) -->
   <div id="test-panel">
     <button class="btn-fs" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-    <button class="btn-snack" onclick="testTreat(1)">+1 Fish</button>
-    <button class="btn-snack" onclick="testTreat(10)">+10 Milk</button>
-    <button class="btn-feast" onclick="testTreat(30)">+30 Tuna</button>
-    <button class="btn-feast" onclick="testTreat(100)">+100 Feast</button>
-    <button style="background:#475569; color:#fff;" onclick="resetChonk()">Reset</button>
+    <button class="btn-print" onclick="testPrint(0)">Print Arm 1</button>
+    <button class="btn-print" onclick="testPrint(1)">Print Arm 2</button>
+    <button class="btn-print" onclick="testPrint(2)">Print Arm 3</button>
+    <button style="background:#f59e0b; color:#000;" onclick="testPrintRandom()">Auto-Route Gift</button>
   </div>
 
   <script>
@@ -379,66 +125,90 @@
     canvas.width = WIDTH;
     canvas.height = HEIGHT;
 
-    const CAT_X = WIDTH / 2;
-    const CAT_Y = HEIGHT * 0.54;
-    const BOWL_Y = CAT_Y + 160;
-
-    let currentTreats = 30;
-    let maxTreats = 200;
-    let chonkLevel = 1;
-    let catScale = 1.0;
-
+    let totalPrintsCount = 0;
     let animFrame = 0;
-    let mouthOpen = 0;
-    let chewTimer = 0;
-    let blinkTimer = 0;
-    let tailAngle = 0;
-    let toastTimeout = null;
 
-    const foods = [];
-    const particles = [];
-    const feeders = {};
+    // --- 3 PARALLEL CONVEYOR LANES ---
+    const NUM_LANES = 3;
+    const MARGIN_X = 50;
+    const TOTAL_WIDTH = WIDTH - MARGIN_X * 2;
+    const LANE_WIDTH = 290;
+    const LANE_SPACING = (TOTAL_WIDTH - LANE_WIDTH * NUM_LANES) / (NUM_LANES - 1);
 
+    const ITEM_HEIGHT = 290;
+    const PRINT_Y = 320; // Height where the mechanical toolhead draws
+
+    // Lane States
+    const lanes = [];
+    for (let i = 0; i < NUM_LANES; i++) {
+      const x = MARGIN_X + i * (LANE_WIDTH + LANE_SPACING);
+      lanes.push({
+        index: i,
+        x: x,
+        centerX: x + LANE_WIDTH / 2,
+        queue: [],
+        items: [], // Printed portraits scrolling down
+        activeJob: null,
+        printProgress: 0,
+        scrollOffset: 0,
+        targetScrollOffset: 0,
+        toolhead: {
+          x: x + LANE_WIDTH / 2,
+          y: PRINT_Y,
+          targetX: x + LANE_WIDTH / 2,
+          targetY: PRINT_Y
+        }
+      });
+    }
+
+    // --- MAIN ENGINE LOOP ---
     function update() {
       animFrame++;
 
-      tailAngle = Math.sin(animFrame * 0.05) * 0.35;
+      // Process each lane
+      for (const lane of lanes) {
+        // Smooth conveyor scrolling
+        lane.scrollOffset += (lane.targetScrollOffset - lane.scrollOffset) * 0.12;
 
-      if (blinkTimer > 0) blinkTimer--;
-      else if (Math.random() < 0.015) blinkTimer = 12;
-
-      if (chewTimer > 0) {
-        chewTimer--;
-        mouthOpen = Math.abs(Math.sin(animFrame * 0.35));
-      } else {
-        mouthOpen = 0;
-      }
-
-      const targetScale = 1.0 + (currentTreats / maxTreats) * 0.45;
-      catScale += (targetScale - catScale) * 0.05;
-
-      for (let i = foods.length - 1; i >= 0; i--) {
-        const f = foods[i];
-        f.vy += 0.45;
-        f.x += f.vx;
-        f.y += f.vy;
-
-        if (f.y > CAT_Y - 240 && f.y < BOWL_Y) {
-          mouthOpen = Math.max(mouthOpen, 0.75);
+        // If idle, check for queued prints
+        if (!lane.activeJob && lane.queue.length > 0) {
+          startPrintingJob(lane, lane.queue.shift());
         }
 
-        if (f.y >= BOWL_Y - 20) {
-          eatFood(f);
-          foods.splice(i, 1);
-        }
-      }
+        // Active Printing Progress
+        if (lane.activeJob) {
+          lane.printProgress += 0.008; // ~3.5 seconds per print
 
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const pt = particles[i];
-        pt.x += pt.vx;
-        pt.y += pt.vy;
-        pt.life -= 0.02;
-        if (pt.life <= 0) particles.splice(i, 1);
+          // Calculate mechanical toolhead movement around the oval frame
+          const drawAngle = lane.printProgress * Math.PI * 14;
+          const wobble = Math.sin(drawAngle) * 5;
+          const ovalRadiusX = (LANE_WIDTH * 0.32) + wobble;
+          const ovalRadiusY = (LANE_WIDTH * 0.38) + wobble;
+
+          lane.toolhead.targetX = lane.centerX + Math.cos(drawAngle) * (ovalRadiusX * Math.min(1, lane.printProgress * 2));
+          lane.toolhead.targetY = PRINT_Y + Math.sin(drawAngle) * (ovalRadiusY * Math.min(1, lane.printProgress * 2));
+
+          // Toolhead physics follow
+          lane.toolhead.x += (lane.toolhead.targetX - lane.toolhead.x) * 0.25;
+          lane.toolhead.y += (lane.toolhead.targetY - lane.toolhead.y) * 0.25;
+
+          // Finished Print
+          if (lane.printProgress >= 1.0) {
+            completePrintingJob(lane);
+          }
+        } else {
+          // Park toolhead smoothly in neutral position
+          lane.toolhead.x += (lane.centerX - lane.toolhead.x) * 0.1;
+          lane.toolhead.y += (PRINT_Y - lane.toolhead.y) * 0.1;
+        }
+
+        // Prune items that have scrolled off the bottom
+        for (let i = lane.items.length - 1; i >= 0; i--) {
+          const item = lane.items[i];
+          if (item.y + lane.scrollOffset > HEIGHT + 150) {
+            lane.items.splice(i, 1);
+          }
+        }
       }
 
       render();
@@ -448,402 +218,285 @@
     function render() {
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-      const bg = ctx.createRadialGradient(CAT_X, CAT_Y - 100, 80, CAT_X, CAT_Y, 800);
-      bg.addColorStop(0, '#2e1065');
-      bg.addColorStop(1, '#0c081e');
+      // 1. Studio Concrete/Marble Floor
+      const bg = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
+      bg.addColorStop(0, '#e8e8ed');
+      bg.addColorStop(1, '#c5c5cc');
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-      ctx.save();
-      ctx.shadowBlur = 30;
-      ctx.shadowColor = 'rgba(244, 114, 182, 0.25)';
-      ctx.fillStyle = '#4c1d95';
-      ctx.beginPath();
-      ctx.ellipse(CAT_X, BOWL_Y + 35, 340 * catScale, 85, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
+      // 2. Draw Top Mechanical Steel Gantry Support Bar
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(0, 90, WIDTH, 24);
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, 102, WIDTH, 4);
 
-      for (const pt of particles) {
-        ctx.save();
-        ctx.globalAlpha = pt.life;
-        if (pt.isHeart) {
-          ctx.font = `${pt.size}px sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.fillText(pt.char, pt.x, pt.y);
-        } else {
-          ctx.fillStyle = pt.color;
-          ctx.beginPath();
-          ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        ctx.restore();
+      // 3. Render 3 Conveyor Paper Rolls & Printed Crests
+      for (const lane of lanes) {
+        drawConveyorLane(lane);
       }
 
-      drawAnimatedCat();
-      drawBowl();
+      // 4. Render 3 Mechanical CNC Toolheads on top
+      for (const lane of lanes) {
+        drawMechanicalToolhead(lane);
+      }
+    }
 
-      for (const f of foods) {
-        ctx.save();
-        ctx.translate(f.x, f.y);
-        ctx.rotate(f.rot);
+    // --- DRAW PARCHMENT SCROLL & PRINTED PORTRAITS ---
+    function drawConveyorLane(lane) {
+      ctx.save();
 
-        ctx.shadowBlur = 18;
-        ctx.shadowColor = '#f472b6';
+      // Paper Belt Drop Shadow
+      ctx.shadowBlur = 24;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.18)';
+      ctx.fillStyle = '#f8f8fa';
+      ctx.fillRect(lane.x, 100, LANE_WIDTH, HEIGHT - 100);
+      ctx.restore();
 
-        ctx.font = '54px sans-serif';
+      // Paper Surface Subtle Texture lines
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.03)';
+      ctx.lineWidth = 1;
+      for (let y = 100; y < HEIGHT; y += 40) {
+        ctx.beginPath();
+        ctx.moveTo(lane.x, y);
+        ctx.lineTo(lane.x + LANE_WIDTH, y);
+        ctx.stroke();
+      }
+
+      // Paper Lateral Rails
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillRect(lane.x, 100, 6, HEIGHT - 100);
+      ctx.fillRect(lane.x + LANE_WIDTH - 6, 100, 6, HEIGHT - 100);
+
+      // Draw Already Printed Portraits (Scrolling Down)
+      for (const item of lane.items) {
+        const renderY = item.y + lane.scrollOffset;
+        if (renderY > 100 && renderY < HEIGHT + 100) {
+          drawOrnatePortrait(lane.centerX, renderY, item, 1.0);
+        }
+      }
+
+      // Draw Currently Printing Portrait
+      if (lane.activeJob) {
+        const currentY = PRINT_Y;
+        drawOrnatePortrait(lane.centerX, currentY, lane.activeJob, lane.printProgress);
+      }
+    }
+
+    // --- ORNATE ROYAL CREST & INK PORTRAIT DRAWING ---
+    function drawOrnatePortrait(x, y, job, progress) {
+      ctx.save();
+
+      const themeColor = job.tier === 'gold' ? '#b45309' : (job.tier === 'royal' ? '#1e3a8a' : '#1e293b');
+      const accentColor = job.tier === 'gold' ? '#f59e0b' : (job.tier === 'royal' ? '#38bdf8' : '#64748b');
+
+      ctx.save();
+      // Clip reveal based on print progress from top to bottom
+      if (progress < 0.99) {
+        ctx.beginPath();
+        ctx.rect(x - LANE_WIDTH / 2, y - 140, LANE_WIDTH, 290 * progress);
+        ctx.clip();
+      }
+
+      // Outer Ornate Oval Frame
+      ctx.lineWidth = 3.5;
+      ctx.strokeStyle = themeColor;
+      ctx.beginPath();
+      ctx.ellipse(x, y, 78, 98, 0, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Inner Beaded Rim
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.ellipse(x, y, 71, 91, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Top Crown / Filigree Emblem
+      ctx.fillStyle = accentColor;
+      ctx.font = '22px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(job.tier === 'royal' ? '👑' : (job.tier === 'gold' ? '⚜️' : '✦'), x, y - 105);
+
+      // Decorative Laurel Flairs (Left & Right)
+      ctx.font = '24px serif';
+      ctx.fillText('❧', x - 88, y);
+      ctx.fillText('☙', x + 88, y);
+
+      // Sender Circular Avatar (Rendered in Blue/Black Ink Etching)
+      const avatarRadius = 52;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x, y, avatarRadius, 0, Math.PI * 2);
+      ctx.clip();
+
+      if (job.img && job.img.complete) {
+        ctx.drawImage(job.img, x - avatarRadius, y - avatarRadius, avatarRadius * 2, avatarRadius * 2);
+
+        // Engraving Tint Overlay
+        ctx.fillStyle = job.tier === 'gold' ? 'rgba(180, 83, 9, 0.22)' : 'rgba(30, 41, 59, 0.28)';
+        ctx.fillRect(x - avatarRadius, y - avatarRadius, avatarRadius * 2, avatarRadius * 2);
+      } else {
+        // Fallback Monogram
+        ctx.fillStyle = '#f1f5f9';
+        ctx.fillRect(x - avatarRadius, y - avatarRadius, avatarRadius * 2, avatarRadius * 2);
+        ctx.fillStyle = themeColor;
+        ctx.font = '900 36px serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(f.emoji, 0, 0);
-
-        if (f.img && f.img.complete) {
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(20, -18, 18, 0, Math.PI * 2);
-          ctx.clip();
-          ctx.drawImage(f.img, 2, -36, 36, 36);
-          ctx.restore();
-
-          ctx.lineWidth = 2.5;
-          ctx.strokeStyle = '#f59e0b';
-          ctx.beginPath();
-          ctx.arc(20, -18, 18, 0, Math.PI * 2);
-          ctx.stroke();
-        }
-
-        ctx.font = 'bold 16px sans-serif';
-        ctx.fillStyle = '#ffffff';
-        ctx.shadowBlur = 6;
-        ctx.shadowColor = '#000';
-        ctx.fillText(f.username, 0, 38);
-
-        ctx.restore();
+        ctx.fillText(job.username.charAt(0).toUpperCase(), x, y);
       }
-    }
-
-    function drawAnimatedCat() {
-      ctx.save();
-      ctx.translate(CAT_X, CAT_Y);
-      ctx.scale(catScale, catScale);
-
-      // Tail
-      ctx.save();
-      ctx.translate(-110, 80);
-      ctx.rotate(tailAngle);
-      ctx.lineWidth = 30;
-      ctx.strokeStyle = '#f97316';
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.quadraticCurveTo(-70, -60, -90, -120);
-      ctx.stroke();
       ctx.restore();
 
-      // Body
-      ctx.save();
-      ctx.shadowBlur = 25;
-      ctx.shadowColor = 'rgba(249, 115, 22, 0.4)';
-      ctx.fillStyle = '#fb923c';
+      // Avatar Border Ring
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = themeColor;
       ctx.beginPath();
-      ctx.ellipse(0, 50, 155, 125, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-
-      // Belly
-      ctx.fillStyle = '#ffedd5';
-      ctx.beginPath();
-      ctx.ellipse(0, 70, 100, 90, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Ears
-      ctx.fillStyle = '#ea580c';
-      ctx.beginPath();
-      ctx.moveTo(-105, -105); ctx.lineTo(-58, -180); ctx.lineTo(-20, -115);
-      ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#f472b6';
-      ctx.beginPath();
-      ctx.moveTo(-92, -110); ctx.lineTo(-58, -162); ctx.lineTo(-34, -120);
-      ctx.closePath(); ctx.fill();
-
-      ctx.fillStyle = '#ea580c';
-      ctx.beginPath();
-      ctx.moveTo(105, -105); ctx.lineTo(58, -180); ctx.lineTo(20, -115);
-      ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#f472b6';
-      ctx.beginPath();
-      ctx.moveTo(92, -110); ctx.lineTo(58, -162); ctx.lineTo(34, -120);
-      ctx.closePath(); ctx.fill();
-
-      // Head
-      ctx.fillStyle = '#fb923c';
-      ctx.beginPath();
-      ctx.arc(0, -65, 115, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Cheeks
-      ctx.fillStyle = '#fdba74';
-      ctx.beginPath();
-      ctx.arc(-68, -40, 46, 0, Math.PI * 2);
-      ctx.arc(68, -40, 46, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Eyes
-      if (blinkTimer > 0) {
-        ctx.lineWidth = 6; ctx.strokeStyle = '#1e1b4b';
-        ctx.beginPath(); ctx.arc(-42, -78, 19, Math.PI, 0); ctx.stroke();
-        ctx.beginPath(); ctx.arc(42, -78, 19, Math.PI, 0); ctx.stroke();
-      } else {
-        ctx.fillStyle = '#1e1b4b';
-        ctx.beginPath();
-        ctx.arc(-42, -78, 20, 0, Math.PI * 2);
-        ctx.arc(42, -78, 20, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(-38, -84, 6, 0, Math.PI * 2);
-        ctx.arc(46, -84, 6, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Nose
-      ctx.fillStyle = '#f43f5e';
-      ctx.beginPath();
-      ctx.moveTo(-10, -45); ctx.lineTo(10, -45); ctx.lineTo(0, -35);
-      ctx.closePath(); ctx.fill();
-
-      // Mouth
-      if (mouthOpen > 0.1) {
-        ctx.fillStyle = '#be123c';
-        ctx.beginPath();
-        ctx.ellipse(0, -22, 20 * mouthOpen, 26 * mouthOpen, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#fb7185';
-        ctx.beginPath();
-        ctx.arc(0, -14, 11 * mouthOpen, 0, Math.PI);
-        ctx.fill();
-      } else {
-        ctx.lineWidth = 4; ctx.strokeStyle = '#1e1b4b';
-        ctx.beginPath(); ctx.arc(-13, -32, 13, 0.1, Math.PI * 0.9); ctx.stroke();
-        ctx.beginPath(); ctx.arc(13, -32, 13, 0.1, Math.PI * 0.9); ctx.stroke();
-      }
-
-      // Whiskers
-      ctx.lineWidth = 3; ctx.strokeStyle = '#7c2d12';
-      ctx.beginPath();
-      ctx.moveTo(-70, -44); ctx.lineTo(-125, -54);
-      ctx.moveTo(-70, -34); ctx.lineTo(-130, -34);
-      ctx.moveTo(-70, -24); ctx.lineTo(-120, -14);
-      ctx.moveTo(70, -44); ctx.lineTo(125, -54);
-      ctx.moveTo(70, -34); ctx.lineTo(130, -34);
-      ctx.moveTo(70, -24); ctx.lineTo(120, -14);
+      ctx.arc(x, y, avatarRadius, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Paws
-      ctx.fillStyle = '#ffedd5';
-      ctx.beginPath();
-      ctx.arc(-52, 135, 30, 0, Math.PI * 2);
-      ctx.arc(52, 135, 30, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.restore();
-    }
-
-    function drawBowl() {
-      ctx.save();
-      ctx.shadowBlur = 18; ctx.shadowColor = '#f472b6';
-
-      ctx.fillStyle = '#f43f5e';
-      ctx.beginPath();
-      ctx.ellipse(CAT_X, BOWL_Y, 120, 44, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#e11d48';
-      ctx.beginPath();
-      ctx.ellipse(CAT_X, BOWL_Y - 7, 110, 32, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#fbbf24';
-      ctx.beginPath();
-      ctx.ellipse(CAT_X, BOWL_Y - 9, 92, 24, 0, 0, Math.PI * 2);
-      ctx.fill();
-
+      // Bottom Banner Ribbon for Username
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 15px sans-serif';
+      ctx.strokeStyle = themeColor;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(x - 85, y + 96, 170, 26, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      // Username Text
+      ctx.fillStyle = themeColor;
+      ctx.font = 'bold 13px -apple-system, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('🐾 CHONK', CAT_X, BOWL_Y + 13);
+      ctx.textBaseline = 'middle';
+      const cleanName = job.username.length > 14 ? job.username.substring(0, 13) + '…' : job.username;
+      ctx.fillText(`@${cleanName}`, x, y + 109);
+
+      ctx.restore();
       ctx.restore();
     }
 
-    function eatFood(food) {
-      chewTimer = 22;
+    // --- MECHANICAL CNC TOOLHEAD & SUSPENSION ARM ---
+    function drawMechanicalToolhead(lane) {
+      const hx = lane.toolhead.x;
+      const hy = lane.toolhead.y;
 
-      currentTreats = Math.min(maxTreats, currentTreats + food.points);
-      updateTreatBar();
+      ctx.save();
 
-      if (!feeders[food.username]) {
-        feeders[food.username] = { points: 0, avatar: food.imgSrc };
+      // 1. Dual Vertical Linear Guide Shafts (Extending from top gantry down to head)
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(hx - 22, 114);
+      ctx.lineTo(hx - 22, hy - 20);
+      ctx.moveTo(hx + 22, 114);
+      ctx.lineTo(hx + 22, hy - 20);
+      ctx.stroke();
+
+      // 2. Extruder / Mechanical Head Carriage Block
+      ctx.shadowBlur = 18;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+
+      ctx.fillStyle = '#1e293b'; // Gunmetal CNC casing
+      ctx.beginPath();
+      ctx.roundRect(hx - 36, hy - 36, 72, 42, 8);
+      ctx.fill();
+
+      // Brushed Metal Plate Detail
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(hx - 26, hy - 26, 52, 14);
+
+      // Status LED on Plotter
+      ctx.fillStyle = lane.activeJob ? '#22c55e' : '#64748b';
+      ctx.beginPath();
+      ctx.arc(hx + 22, hy - 26, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3. Nozzle Needle / Stylus Pen Tip
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.moveTo(hx - 7, hy + 6);
+      ctx.lineTo(hx + 7, hy + 6);
+      ctx.lineTo(hx, hy + 22);
+      ctx.closePath();
+      ctx.fill();
+
+      // 4. Stylus Active Spark / Ink Glow Tip
+      if (lane.activeJob) {
+        ctx.shadowBlur = 16;
+        ctx.shadowColor = '#38bdf8';
+        ctx.fillStyle = '#60a5fa';
+        ctx.beginPath();
+        ctx.arc(hx, hy + 22, 3, 0, Math.PI * 2);
+        ctx.fill();
       }
-      feeders[food.username].points += food.points;
-      if (food.imgSrc) feeders[food.username].avatar = food.imgSrc;
 
-      updateFeedersDisplay();
-      showFeedToast(food.username, food.points, food.emoji);
-      spawnNomParticles(CAT_X, BOWL_Y - 40, food.points);
-
-      if (currentTreats >= maxTreats) {
-        triggerCelebration();
-      }
+      ctx.restore();
     }
 
-    function showFeedToast(username, points, emoji) {
-      const toast = document.getElementById('recent-feed-toast');
-      const text = document.getElementById('recent-toast-text');
-      text.innerText = `${username} fed ${emoji} +${points} treats!`;
-      toast.classList.add('show');
+    // --- PRINTING QUEUE & ROUTING ---
+    function routeIncomingGift(username, avatarUrl, coins) {
+      let tier = 'silver';
+      if (coins >= 100) tier = 'royal';
+      else if (coins >= 30) tier = 'gold';
 
-      if (toastTimeout) clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
-    }
-
-    function updateFeedersDisplay() {
-      const sorted = Object.entries(feeders)
-        .sort((a, b) => b[1].points - a[1].points)
-        .slice(0, 3);
-
-      if (sorted[0]) {
-        document.getElementById('rank1-name').innerText = sorted[0][0];
-        document.getElementById('rank1-treats').innerText = `${sorted[0][1].points} treats`;
-        if (sorted[0][1].avatar) document.getElementById('rank1-img').src = sorted[0][1].avatar;
-      }
-      if (sorted[1]) {
-        document.getElementById('rank2-name').innerText = sorted[1][0];
-        document.getElementById('rank2-treats').innerText = `${sorted[1][1].points} treats`;
-        if (sorted[1][1].avatar) document.getElementById('rank2-img').src = sorted[1][1].avatar;
-      }
-      if (sorted[2]) {
-        document.getElementById('rank3-name').innerText = sorted[2][0];
-        document.getElementById('rank3-treats').innerText = `${sorted[2][1].points} treats`;
-        if (sorted[2][1].avatar) document.getElementById('rank3-img').src = sorted[2][1].avatar;
-      }
-    }
-
-    function spawnNomParticles(x, y, points) {
-      const count = points >= 30 ? 15 : 6;
-      for (let i = 0; i < count; i++) {
-        particles.push({
-          x: x + (Math.random() - 0.5) * 80,
-          y: y,
-          vx: (Math.random() - 0.5) * 4,
-          vy: -2 - Math.random() * 4,
-          size: 20 + Math.random() * 14,
-          isHeart: true,
-          char: Math.random() > 0.5 ? '💖' : '✨',
-          life: 1.0
-        });
-      }
-
-      particles.push({
-        x: x,
-        y: y - 30,
-        vx: 0,
-        vy: -1.5,
-        size: points >= 30 ? 30 : 22,
-        isHeart: true,
-        char: points >= 100 ? '😻 YUMMY!!' : '😋 NOM NOM!',
-        life: 1.0
-      });
-    }
-
-    function updateTreatBar() {
-      const pct = Math.round((currentTreats / maxTreats) * 100);
-      document.getElementById('food-bar').style.width = `${pct}%`;
-      document.getElementById('food-bar-text').innerText = `${currentTreats} / ${maxTreats} TREATS (${pct}%)`;
-    }
-
-    function triggerCelebration() {
-      const banner = document.getElementById('celebrate-banner');
-      chonkLevel++;
-      document.getElementById('cat-level-badge').innerText = `🐱 LEVEL ${chonkLevel}: ULTRA MEGA CHONK`;
-
-      banner.style.transform = 'translate(-50%, -50%) scale(1)';
-
-      for (let i = 0; i < 50; i++) {
-        particles.push({
-          x: CAT_X,
-          y: CAT_Y,
-          vx: (Math.random() - 0.5) * 14,
-          vy: -6 - Math.random() * 10,
-          size: 6 + Math.random() * 6,
-          color: '#f59e0b',
-          isHeart: false,
-          life: 1.5
-        });
-      }
-
-      setTimeout(() => {
-        banner.style.transform = 'translate(-50%, -50%) scale(0)';
-        currentTreats = 20;
-        maxTreats = Math.round(maxTreats * 1.5);
-        updateTreatBar();
-      }, 5000);
-    }
-
-    function resetChonk() {
-      currentTreats = 30;
-      maxTreats = 200;
-      chonkLevel = 1;
-      catScale = 1.0;
-      document.getElementById('cat-level-badge').innerText = '🐱 LEVEL 1: CUTE CHONK';
-      updateTreatBar();
-    }
-
-    function spawnFood(username, avatarUrl, coins) {
-      let emoji = '🐟';
-      let points = 1;
-
-      if (coins >= 1000) {
-        emoji = '👑';
-        points = 1000;
-      } else if (coins >= 100) {
-        emoji = '🍗';
-        points = 100;
-      } else if (coins >= 30) {
-        emoji = '🥫';
-        points = 30;
-      } else if (coins >= 10) {
-        emoji = '🥛';
-        points = 10;
-      }
-
-      const foodItem = {
+      const job = {
         username: username,
-        emoji: emoji,
-        points: points,
-        x: CAT_X + (Math.random() - 0.5) * 160,
-        y: 60,
-        vx: (Math.random() - 0.5) * 2,
-        vy: 2 + Math.random() * 2,
-        rot: (Math.random() - 0.5) * 0.4,
-        imgSrc: avatarUrl,
+        avatarUrl: avatarUrl,
+        tier: tier,
         img: null
       };
 
       if (avatarUrl) {
-        foodItem.img = new Image();
-        foodItem.img.src = avatarUrl;
+        job.img = new Image();
+        job.img.src = avatarUrl;
       }
 
-      foods.push(foodItem);
+      // Pick lane with shortest combined queue & workload
+      let bestLane = lanes[0];
+      let minLoad = Infinity;
+
+      for (const l of lanes) {
+        const load = l.queue.length + (l.activeJob ? 1 : 0);
+        if (load < minLoad) {
+          minLoad = load;
+          bestLane = l;
+        }
+      }
+
+      bestLane.queue.push(job);
     }
 
-    // Toggle Secret Panel
+    function startPrintingJob(lane, job) {
+      lane.activeJob = job;
+      lane.printProgress = 0;
+    }
+
+    function completePrintingJob(lane) {
+      // Transfer to completed scrolling items
+      lane.items.unshift({
+        ...lane.activeJob,
+        y: PRINT_Y - lane.scrollOffset
+      });
+
+      // Shift entire conveyor down by 1 full card distance
+      lane.targetScrollOffset += ITEM_HEIGHT;
+
+      lane.activeJob = null;
+      lane.printProgress = 0;
+
+      totalPrintsCount++;
+      document.getElementById('print-counter').innerText = totalPrintsCount;
+    }
+
+    // --- TESTING CONTROLS ---
     window.toggleTestPanel = function() {
       const p = document.getElementById('test-panel');
       p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
     };
 
-    // Toggle Mobile Fullscreen Mode
     window.toggleFullscreen = function() {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(() => {});
@@ -852,20 +505,32 @@
       }
     };
 
-    window.testTreat = function(coins) {
-      const names = ['Sarah', 'KittyLover', 'NyanCat', 'Alex', 'Leo'];
-      const randomName = names[Math.floor(Math.random() * names.length)];
-      spawnFood(randomName, null, coins);
+    const mockNames = ['Lissandraa', 'Sofia Fillmon', 'AU', 'REZA', 'Djeki', 'Rin_Stance'];
+
+    window.testPrint = function(laneIndex) {
+      const name = mockNames[Math.floor(Math.random() * mockNames.length)];
+      lanes[laneIndex].queue.push({
+        username: name,
+        avatarUrl: null,
+        tier: Math.random() > 0.5 ? 'gold' : 'silver',
+        img: null
+      });
     };
 
-    // --- WEBSOCKET EVENT LISTENER ---
+    window.testPrintRandom = function() {
+      const name = mockNames[Math.floor(Math.random() * mockNames.length)];
+      routeIncomingGift(name, null, 1);
+    };
+
+    // --- LIVE WEBSOCKET LISTENER ---
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const socket = new WebSocket(`${protocol}//${window.location.host}`);
 
     socket.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
       if (data.type === 'GIFT') {
-        spawnFood(data.username, data.avatar, data.diamondCount || 1);
+        const coins = data.diamondCount || 1;
+        routeIncomingGift(data.username, data.avatar, coins);
       }
     };
 
@@ -873,5 +538,3 @@
   </script>
 </body>
 </html>
-
-   
