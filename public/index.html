@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#d9d9df">
-  <title>3Hands - Live Plotter Engraver</title>
+  <meta name="theme-color" content="#c8c8cf">
+  <title>3Hands - Real Mechanical CNC Plotter</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #c8c8cf;
+      background: #b5b5be;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       user-select: none;
@@ -19,101 +19,103 @@
     }
 
     #secret-tap-zone {
-      position: absolute; top: 0; left: 0; width: 100%; height: 60px; z-index: 100;
+      position: absolute; top: 0; left: 0; width: 100%; height: 50px; z-index: 100;
     }
 
     #game-canvas {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     }
 
-    /* --- TOP BRANDING & GIFT TIERS HUD --- */
+    /* --- TOP OVERLAY HUD --- */
     #top-bar {
-      position: absolute; top: 18px; left: 0; width: 100%;
+      position: absolute; top: 16px; left: 0; width: 100%;
       display: flex; justify-content: space-between; align-items: flex-start;
       padding: 0 16px; z-index: 50; pointer-events: none;
     }
 
     .brand-box {
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 14px;
       padding: 6px 14px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
       border: 1px solid rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(8px);
     }
     .brand-title {
-      font-size: 16px; font-weight: 900; color: #1e293b; letter-spacing: 0.5px;
+      font-size: 15px; font-weight: 900; color: #0f172a; letter-spacing: 0.5px;
     }
     .brand-sub {
-      font-size: 10px; font-weight: 700; color: #64748b;
+      font-size: 9px; font-weight: 800; color: #64748b; letter-spacing: 0.5px;
     }
 
-    .live-counter-pill {
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 12px;
+    .stats-pill {
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 14px;
       padding: 6px 14px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
       text-align: right;
+      backdrop-filter: blur(8px);
     }
-    .counter-title { font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; }
-    .counter-num { font-size: 16px; font-weight: 900; color: #2563eb; }
+    .stats-label { font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase; }
+    .stats-num { font-size: 16px; font-weight: 900; color: #1e3a8a; }
 
-    /* Bottom Gift Badges Guide */
+    /* Bottom Guide */
     #gift-guide {
-      position: absolute; bottom: 20px; right: 16px;
-      background: rgba(255, 255, 255, 0.92);
-      border-radius: 14px; padding: 8px 12px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      position: absolute; bottom: 18px; right: 14px;
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 14px; padding: 7px 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
       z-index: 50; pointer-events: none;
       display: flex; flex-direction: column; gap: 4px;
+      backdrop-filter: blur(8px);
     }
-    .guide-tag {
-      font-size: 11px; font-weight: 900; color: #1e293b; display: flex; align-items: center; gap: 6px;
+    .guide-item {
+      font-size: 11px; font-weight: 900; color: #0f172a; display: flex; align-items: center; gap: 6px;
     }
-    .guide-tag span { color: #2563eb; }
+    .guide-item span { color: #1e3a8a; }
 
-    /* Offline Secret Test Panel */
+    /* Secret Test Panel */
     #test-panel {
       position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%);
       display: none; gap: 6px; background: rgba(15, 23, 42, 0.95); padding: 8px 12px;
-      border-radius: 12px; z-index: 150;
+      border-radius: 14px; z-index: 150; box-shadow: 0 8px 30px rgba(0,0,0,0.6);
     }
     button {
       border: none; padding: 7px 11px; border-radius: 6px;
       font-weight: 900; cursor: pointer; font-size: 11px;
     }
     .btn-fs { background: #22c55e; color: #000; }
-    .btn-print { background: #38bdf8; color: #000; }
+    .btn-lane { background: #38bdf8; color: #000; }
   </style>
 </head>
 <body>
-  <!-- Secret Tap Zone at top to reveal offline testing controls -->
   <div id="secret-tap-zone" onclick="toggleTestPanel()"></div>
 
   <div id="top-bar">
     <div class="brand-box">
       <div class="brand-title">3Hands Studio ✍️</div>
-      <div class="brand-sub">Automated CNC Portrait Plotter</div>
+      <div class="brand-sub">CNC REAL-TIME PLOTTER</div>
     </div>
-    <div class="live-counter-pill">
-      <div class="counter-title">Prints Completed</div>
-      <div class="counter-num" id="print-counter">0</div>
+    <div class="stats-pill">
+      <div class="stats-label">TOTAL PRINTS</div>
+      <div class="stats-num" id="total-prints">0</div>
     </div>
   </div>
 
   <div id="gift-guide">
-    <div class="guide-tag">🌹 1 Rose = <span>Classic Crest</span></div>
-    <div class="guide-tag">🍩 30 Coins = <span>Royal Gold Seal</span></div>
-    <div class="guide-tag">🎉 100 Coins = <span>Imperial Crown</span></div>
+    <div class="guide-item">🌹 1 Rose = <span>Classic Crest</span></div>
+    <div class="guide-item">🍩 30 Coins = <span>Royal Seal</span></div>
+    <div class="guide-item">🎉 100 Coins = <span>Imperial Crown</span></div>
   </div>
 
   <canvas id="game-canvas"></canvas>
 
   <div id="test-panel">
     <button class="btn-fs" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-    <button class="btn-print" onclick="testPrint(0)">Print Arm 1</button>
-    <button class="btn-print" onclick="testPrint(1)">Print Arm 2</button>
-    <button class="btn-print" onclick="testPrint(2)">Print Arm 3</button>
-    <button style="background:#f59e0b; color:#000;" onclick="testPrintRandom()">Auto-Route Gift</button>
+    <button class="btn-lane" onclick="testPrint(0)">Arm 1</button>
+    <button class="btn-lane" onclick="testPrint(1)">Arm 2</button>
+    <button class="btn-lane" onclick="testPrint(2)">Arm 3</button>
+    <button style="background:#f59e0b; color:#000;" onclick="testPrintRandom()">Auto-Route</button>
   </div>
 
   <script>
@@ -128,17 +130,16 @@
     let totalPrintsCount = 0;
     let animFrame = 0;
 
-    // --- 3 PARALLEL CONVEYOR LANES ---
+    // --- 3 CONVEYOR LANES GEOMETRY ---
     const NUM_LANES = 3;
-    const MARGIN_X = 50;
+    const MARGIN_X = 40;
     const TOTAL_WIDTH = WIDTH - MARGIN_X * 2;
-    const LANE_WIDTH = 290;
+    const LANE_WIDTH = 300;
     const LANE_SPACING = (TOTAL_WIDTH - LANE_WIDTH * NUM_LANES) / (NUM_LANES - 1);
 
-    const ITEM_HEIGHT = 290;
-    const PRINT_Y = 320; // Height where the mechanical toolhead draws
+    const ITEM_HEIGHT = 310;
+    const PRINT_Y = 320; // Exact Y center where pen draws on paper
 
-    // Lane States
     const lanes = [];
     for (let i = 0; i < NUM_LANES; i++) {
       const x = MARGIN_X + i * (LANE_WIDTH + LANE_SPACING);
@@ -147,65 +148,159 @@
         x: x,
         centerX: x + LANE_WIDTH / 2,
         queue: [],
-        items: [], // Printed portraits scrolling down
+        items: [],
         activeJob: null,
-        printProgress: 0,
+        toolpath: [],
+        pathIndex: 0,
         scrollOffset: 0,
         targetScrollOffset: 0,
         toolhead: {
           x: x + LANE_WIDTH / 2,
           y: PRINT_Y,
-          targetX: x + LANE_WIDTH / 2,
-          targetY: PRINT_Y
+          penDown: false,
+          liftZ: 0
         }
       });
     }
 
-    // --- MAIN ENGINE LOOP ---
+    // --- PROCEDURAL G-CODE VECTOR TOOLPATH GENERATOR ---
+    function buildPlotterToolpath(cx, cy) {
+      const pts = [];
+
+      // 1. Crown / Top Finial Flourish
+      pts.push({ x: cx - 25, y: cy - 120, penDown: false });
+      pts.push({ x: cx - 18, y: cy - 132, penDown: true });
+      pts.push({ x: cx, y: cy - 124, penDown: true });
+      pts.push({ x: cx + 18, y: cy - 132, penDown: true });
+      pts.push({ x: cx + 25, y: cy - 120, penDown: true });
+      pts.push({ x: cx, y: cy - 110, penDown: true });
+      pts.push({ x: cx - 25, y: cy - 120, penDown: true });
+
+      // 2. Left Baroque Leaf Spiral
+      pts.push({ x: cx - 80, y: cy - 40, penDown: false });
+      for (let t = 0; t <= Math.PI * 1.5; t += 0.15) {
+        const rad = 25 - t * 5;
+        pts.push({
+          x: cx - 85 + Math.cos(t) * rad,
+          y: cy - 40 + Math.sin(t) * rad,
+          penDown: true
+        });
+      }
+
+      // 3. Right Baroque Leaf Spiral
+      pts.push({ x: cx + 80, y: cy - 40, penDown: false });
+      for (let t = 0; t <= Math.PI * 1.5; t += 0.15) {
+        const rad = 25 - t * 5;
+        pts.push({
+          x: cx + 85 - Math.cos(t) * rad,
+          y: cy - 40 + Math.sin(t) * rad,
+          penDown: true
+        });
+      }
+
+      // 4. Outer Filigree Oval Rim (Full 360 Loop)
+      pts.push({ x: cx + 84, y: cy, penDown: false });
+      for (let a = 0; a <= Math.PI * 2 + 0.1; a += 0.08) {
+        pts.push({
+          x: cx + Math.cos(a) * 84,
+          y: cy + Math.sin(a) * 104,
+          penDown: true
+        });
+      }
+
+      // 5. Beaded Inner Oval Rim
+      pts.push({ x: cx + 76, y: cy, penDown: false });
+      for (let a = 0; a <= Math.PI * 2 + 0.1; a += 0.1) {
+        pts.push({
+          x: cx + Math.cos(a) * 76,
+          y: cy + Math.sin(a) * 96,
+          penDown: true
+        });
+      }
+
+      // 6. Avatar Infill Shading (Dense Horizontal CNC Scan Lines across the portrait)
+      const avatarR = 56;
+      for (let sy = -avatarR + 4; sy <= avatarR - 4; sy += 7) {
+        const chord = Math.sqrt(avatarR * avatarR - sy * sy);
+        // Left to right stroke
+        pts.push({ x: cx - chord, y: cy + sy, penDown: false });
+        pts.push({ x: cx + chord, y: cy + sy, penDown: true });
+      }
+
+      // 7. Circular Medallion Frame
+      pts.push({ x: cx + avatarR, y: cy, penDown: false });
+      for (let a = 0; a <= Math.PI * 2 + 0.1; a += 0.12) {
+        pts.push({
+          x: cx + Math.cos(a) * avatarR,
+          y: cy + Math.sin(a) * avatarR,
+          penDown: true
+        });
+      }
+
+      // 8. Ribbon Nameplate Banner (Bottom Box)
+      const rw = 88;
+      const rh = 13;
+      const ry = cy + 112;
+      pts.push({ x: cx - rw, y: ry - rh, penDown: false });
+      pts.push({ x: cx + rw, y: ry - rh, penDown: true });
+      pts.push({ x: cx + rw + 8, y: ry, penDown: true });
+      pts.push({ x: cx + rw, y: ry + rh, penDown: true });
+      pts.push({ x: cx - rw, y: ry + rh, penDown: true });
+      pts.push({ x: cx - rw - 8, y: ry, penDown: true });
+      pts.push({ x: cx - rw, y: ry - rh, penDown: true });
+
+      // 9. Signature / Username Underline Stroke
+      pts.push({ x: cx - 65, y: ry + 6, penDown: false });
+      pts.push({ x: cx + 65, y: ry + 6, penDown: true });
+
+      return pts;
+    }
+
+    // --- GAME ENGINE LOOP ---
     function update() {
       animFrame++;
 
-      // Process each lane
       for (const lane of lanes) {
-        // Smooth conveyor scrolling
-        lane.scrollOffset += (lane.targetScrollOffset - lane.scrollOffset) * 0.12;
+        // Conveyor Paper Advance
+        lane.scrollOffset += (lane.targetScrollOffset - lane.scrollOffset) * 0.1;
 
-        // If idle, check for queued prints
+        // Check Queue
         if (!lane.activeJob && lane.queue.length > 0) {
           startPrintingJob(lane, lane.queue.shift());
         }
 
-        // Active Printing Progress
+        // Active Printing Execution
         if (lane.activeJob) {
-          lane.printProgress += 0.008; // ~3.5 seconds per print
+          // Drawing speed: 2 toolpath points per animation frame
+          const stepSpeed = 2;
+          lane.pathIndex = Math.min(lane.toolpath.length - 1, lane.pathIndex + stepSpeed);
 
-          // Calculate mechanical toolhead movement around the oval frame
-          const drawAngle = lane.printProgress * Math.PI * 14;
-          const wobble = Math.sin(drawAngle) * 5;
-          const ovalRadiusX = (LANE_WIDTH * 0.32) + wobble;
-          const ovalRadiusY = (LANE_WIDTH * 0.38) + wobble;
+          const targetPt = lane.toolpath[lane.pathIndex];
 
-          lane.toolhead.targetX = lane.centerX + Math.cos(drawAngle) * (ovalRadiusX * Math.min(1, lane.printProgress * 2));
-          lane.toolhead.targetY = PRINT_Y + Math.sin(drawAngle) * (ovalRadiusY * Math.min(1, lane.printProgress * 2));
+          // Stepper motor micro-jitter for tactile realism
+          const jitterX = targetPt.penDown ? (Math.random() - 0.5) * 0.8 : 0;
+          const jitterY = targetPt.penDown ? (Math.random() - 0.5) * 0.8 : 0;
 
-          // Toolhead physics follow
-          lane.toolhead.x += (lane.toolhead.targetX - lane.toolhead.x) * 0.25;
-          lane.toolhead.y += (lane.toolhead.targetY - lane.toolhead.y) * 0.25;
+          lane.toolhead.x = targetPt.x + jitterX;
+          lane.toolhead.y = targetPt.y + jitterY;
+          lane.toolhead.penDown = targetPt.penDown;
+          lane.toolhead.liftZ = targetPt.penDown ? 0 : 8; // Pen lifts up when moving
 
-          // Finished Print
-          if (lane.printProgress >= 1.0) {
+          // Job Finished!
+          if (lane.pathIndex >= lane.toolpath.length - 1) {
             completePrintingJob(lane);
           }
         } else {
-          // Park toolhead smoothly in neutral position
+          // Idle park head
           lane.toolhead.x += (lane.centerX - lane.toolhead.x) * 0.1;
           lane.toolhead.y += (PRINT_Y - lane.toolhead.y) * 0.1;
+          lane.toolhead.penDown = false;
+          lane.toolhead.liftZ = 12;
         }
 
-        // Prune items that have scrolled off the bottom
+        // Prune off-screen items
         for (let i = lane.items.length - 1; i >= 0; i--) {
-          const item = lane.items[i];
-          if (item.y + lane.scrollOffset > HEIGHT + 150) {
+          if (lane.items[i].y + lane.scrollOffset > HEIGHT + 150) {
             lane.items.splice(i, 1);
           }
         }
@@ -218,225 +313,355 @@
     function render() {
       ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-      // 1. Studio Concrete/Marble Floor
-      const bg = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
-      bg.addColorStop(0, '#e8e8ed');
-      bg.addColorStop(1, '#c5c5cc');
-      ctx.fillStyle = bg;
+      // 1. Studio Concrete Workbench Background
+      ctx.fillStyle = '#c5c5ce';
       ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-      // 2. Draw Top Mechanical Steel Gantry Support Bar
-      ctx.fillStyle = '#475569';
-      ctx.fillRect(0, 90, WIDTH, 24);
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(0, 102, WIDTH, 4);
+      // Background subtle mechanical shadow
+      const grad = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+      grad.addColorStop(0, 'rgba(0,0,0,0.12)');
+      grad.addColorStop(1, 'rgba(0,0,0,0.02)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-      // 3. Render 3 Conveyor Paper Rolls & Printed Crests
+      // 2. Continuous Parchment Rolls & Printed Artwork
       for (const lane of lanes) {
-        drawConveyorLane(lane);
+        drawParchmentRoll(lane);
       }
 
-      // 4. Render 3 Mechanical CNC Toolheads on top
+      // 3. Top Aluminum V-Slot Rail & Stepper Drive Gantry
+      drawTopGantryStructure();
+
+      // 4. 3D Mechanical CNC Extruder Heads (Drawn in front with depth)
       for (const lane of lanes) {
-        drawMechanicalToolhead(lane);
+        draw3DExtruderHead(lane);
       }
     }
 
-    // --- DRAW PARCHMENT SCROLL & PRINTED PORTRAITS ---
-    function drawConveyorLane(lane) {
+    // --- DRAW CONTINUOUS PAPER ROLL & DRAWN INK ---
+    function drawParchmentRoll(lane) {
       ctx.save();
 
-      // Paper Belt Drop Shadow
-      ctx.shadowBlur = 24;
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.18)';
-      ctx.fillStyle = '#f8f8fa';
-      ctx.fillRect(lane.x, 100, LANE_WIDTH, HEIGHT - 100);
+      // Deep Shadow behind paper strip
+      ctx.shadowBlur = 22;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.22)';
+      ctx.shadowOffsetX = 6;
+      ctx.shadowOffsetY = 10;
+      ctx.fillStyle = '#fafafc'; // Crisp bright parchment
+      ctx.fillRect(lane.x, 90, LANE_WIDTH, HEIGHT - 90);
       ctx.restore();
 
-      // Paper Surface Subtle Texture lines
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.03)';
+      // Paper Guide Rails & Perforations
+      ctx.fillStyle = '#d1d5db';
+      ctx.fillRect(lane.x, 90, 5, HEIGHT - 90);
+      ctx.fillRect(lane.x + LANE_WIDTH - 5, 90, 5, HEIGHT - 90);
+
+      // Micro paper grain lines
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.025)';
       ctx.lineWidth = 1;
-      for (let y = 100; y < HEIGHT; y += 40) {
+      for (let y = 100; y < HEIGHT; y += 45) {
         ctx.beginPath();
         ctx.moveTo(lane.x, y);
         ctx.lineTo(lane.x + LANE_WIDTH, y);
         ctx.stroke();
       }
 
-      // Paper Lateral Rails
-      ctx.fillStyle = '#cbd5e1';
-      ctx.fillRect(lane.x, 100, 6, HEIGHT - 100);
-      ctx.fillRect(lane.x + LANE_WIDTH - 6, 100, 6, HEIGHT - 100);
-
-      // Draw Already Printed Portraits (Scrolling Down)
+      // Draw Completed Printed Items (Scrolling Down)
       for (const item of lane.items) {
         const renderY = item.y + lane.scrollOffset;
-        if (renderY > 100 && renderY < HEIGHT + 100) {
-          drawOrnatePortrait(lane.centerX, renderY, item, 1.0);
+        if (renderY > 70 && renderY < HEIGHT + 120) {
+          drawFullPortrait(lane.centerX, renderY, item);
         }
       }
 
-      // Draw Currently Printing Portrait
+      // Draw Active In-Progress Print (Toolpath lines drawn up to pathIndex)
       if (lane.activeJob) {
-        const currentY = PRINT_Y;
-        drawOrnatePortrait(lane.centerX, currentY, lane.activeJob, lane.printProgress);
+        drawProgressiveToolpath(lane);
       }
     }
 
-    // --- ORNATE ROYAL CREST & INK PORTRAIT DRAWING ---
-    function drawOrnatePortrait(x, y, job, progress) {
+    // --- DRAW VECTOR STROKES IN REAL-TIME AS PEN MOVES ---
+    function drawProgressiveToolpath(lane) {
+      const job = lane.activeJob;
+      const pts = lane.toolpath;
+      const maxIdx = lane.pathIndex;
+
       ctx.save();
 
-      const themeColor = job.tier === 'gold' ? '#b45309' : (job.tier === 'royal' ? '#1e3a8a' : '#1e293b');
-      const accentColor = job.tier === 'gold' ? '#f59e0b' : (job.tier === 'royal' ? '#38bdf8' : '#64748b');
+      // Embossed Dark Navy/Blue Ink Color
+      const inkColor = job.tier === 'royal' ? '#0f265c' : (job.tier === 'gold' ? '#78350f' : '#1e293b');
+      ctx.strokeStyle = inkColor;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 2.4;
 
-      ctx.save();
-      // Clip reveal based on print progress from top to bottom
-      if (progress < 0.99) {
+      // Draw vector lines sequentially
+      ctx.beginPath();
+      let isDrawing = false;
+
+      for (let i = 0; i <= maxIdx; i++) {
+        const pt = pts[i];
+        if (!pt.penDown) {
+          isDrawing = false;
+        } else {
+          if (!isDrawing) {
+            ctx.moveTo(pt.x, pt.y);
+            isDrawing = true;
+          } else {
+            ctx.lineTo(pt.x, pt.y);
+          }
+        }
+      }
+      ctx.stroke();
+
+      // Progressively reveal the sender's avatar underneath the hatch lines
+      const hatchStart = Math.floor(pts.length * 0.45);
+      if (maxIdx > hatchStart) {
+        const revealPct = (maxIdx - hatchStart) / (pts.length - hatchStart);
+        const avatarR = 56;
+        ctx.save();
         ctx.beginPath();
-        ctx.rect(x - LANE_WIDTH / 2, y - 140, LANE_WIDTH, 290 * progress);
+        ctx.arc(lane.centerX, PRINT_Y, avatarR, 0, Math.PI * 2);
         ctx.clip();
+
+        // Reveal wipe following hatch progress
+        ctx.beginPath();
+        ctx.rect(lane.centerX - avatarR, PRINT_Y - avatarR, avatarR * 2, avatarR * 2 * revealPct);
+        ctx.clip();
+
+        if (job.img && job.img.complete) {
+          ctx.drawImage(job.img, lane.centerX - avatarR, PRINT_Y - avatarR, avatarR * 2, avatarR * 2);
+
+          // Deep Blue Ink sketch glaze
+          ctx.fillStyle = 'rgba(15, 38, 92, 0.28)';
+          ctx.fillRect(lane.centerX - avatarR, PRINT_Y - avatarR, avatarR * 2, avatarR * 2);
+        } else {
+          ctx.fillStyle = '#f1f5f9';
+          ctx.fillRect(lane.centerX - avatarR, PRINT_Y - avatarR, avatarR * 2, avatarR * 2);
+          ctx.fillStyle = inkColor;
+          ctx.font = '900 38px serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(job.username.charAt(0).toUpperCase(), lane.centerX, PRINT_Y);
+        }
+        ctx.restore();
       }
 
-      // Outer Ornate Oval Frame
-      ctx.lineWidth = 3.5;
-      ctx.strokeStyle = themeColor;
+      // Draw username on the ribbon when reached
+      if (maxIdx >= pts.length - 6) {
+        ctx.fillStyle = inkColor;
+        ctx.font = 'bold 13px -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const cleanName = job.username.length > 13 ? job.username.substring(0, 12) + '…' : job.username;
+        ctx.fillText(`@${cleanName}`, lane.centerX, PRINT_Y + 112);
+      }
+
+      ctx.restore();
+    }
+
+    // --- DRAW FINISHED ENGRAVED PORTRAIT (POST-PRINT) ---
+    function drawFullPortrait(cx, cy, job) {
+      ctx.save();
+
+      const inkColor = job.tier === 'royal' ? '#0f265c' : (job.tier === 'gold' ? '#78350f' : '#1e293b');
+      ctx.strokeStyle = inkColor;
+      ctx.lineWidth = 2.4;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      // Outer Ornate Oval
       ctx.beginPath();
-      ctx.ellipse(x, y, 78, 98, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx, cy, 84, 104, 0, 0, Math.PI * 2);
       ctx.stroke();
 
       // Inner Beaded Rim
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([5, 5]);
+      ctx.lineWidth = 1.4;
+      ctx.setLineDash([4, 4]);
       ctx.beginPath();
-      ctx.ellipse(x, y, 71, 91, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx, cy, 76, 96, 0, 0, Math.PI * 2);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Top Crown / Filigree Emblem
-      ctx.fillStyle = accentColor;
+      // Top Crown / Crest
+      ctx.fillStyle = inkColor;
       ctx.font = '22px serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(job.tier === 'royal' ? '👑' : (job.tier === 'gold' ? '⚜️' : '✦'), x, y - 105);
+      ctx.fillText(job.tier === 'royal' ? '👑' : '⚜️', cx, cy - 124);
 
-      // Decorative Laurel Flairs (Left & Right)
-      ctx.font = '24px serif';
-      ctx.fillText('❧', x - 88, y);
-      ctx.fillText('☙', x + 88, y);
+      // Side Flourish
+      ctx.font = '22px serif';
+      ctx.fillText('❧', cx - 88, cy - 40);
+      ctx.fillText('☙', cx + 88, cy - 40);
 
-      // Sender Circular Avatar (Rendered in Blue/Black Ink Etching)
-      const avatarRadius = 52;
+      // Avatar
+      const avatarR = 56;
       ctx.save();
       ctx.beginPath();
-      ctx.arc(x, y, avatarRadius, 0, Math.PI * 2);
+      ctx.arc(cx, cy, avatarR, 0, Math.PI * 2);
       ctx.clip();
 
       if (job.img && job.img.complete) {
-        ctx.drawImage(job.img, x - avatarRadius, y - avatarRadius, avatarRadius * 2, avatarRadius * 2);
-
-        // Engraving Tint Overlay
-        ctx.fillStyle = job.tier === 'gold' ? 'rgba(180, 83, 9, 0.22)' : 'rgba(30, 41, 59, 0.28)';
-        ctx.fillRect(x - avatarRadius, y - avatarRadius, avatarRadius * 2, avatarRadius * 2);
+        ctx.drawImage(job.img, cx - avatarR, cy - avatarR, avatarR * 2, avatarR * 2);
+        ctx.fillStyle = 'rgba(15, 38, 92, 0.28)';
+        ctx.fillRect(cx - avatarR, cy - avatarR, avatarR * 2, avatarR * 2);
       } else {
-        // Fallback Monogram
         ctx.fillStyle = '#f1f5f9';
-        ctx.fillRect(x - avatarRadius, y - avatarRadius, avatarRadius * 2, avatarRadius * 2);
-        ctx.fillStyle = themeColor;
-        ctx.font = '900 36px serif';
+        ctx.fillRect(cx - avatarR, cy - avatarR, avatarR * 2, avatarR * 2);
+        ctx.fillStyle = inkColor;
+        ctx.font = '900 38px serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(job.username.charAt(0).toUpperCase(), x, y);
+        ctx.fillText(job.username.charAt(0).toUpperCase(), cx, cy);
       }
       ctx.restore();
 
-      // Avatar Border Ring
-      ctx.lineWidth = 2.5;
-      ctx.strokeStyle = themeColor;
+      // Avatar Outer Rim
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = inkColor;
       ctx.beginPath();
-      ctx.arc(x, y, avatarRadius, 0, Math.PI * 2);
+      ctx.arc(cx, cy, avatarR, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Bottom Banner Ribbon for Username
+      // Ribbon
       ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = themeColor;
-      ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.roundRect(x - 85, y + 96, 170, 26, 6);
+      ctx.roundRect(cx - 88, cy + 99, 176, 26, 6);
       ctx.fill();
       ctx.stroke();
 
-      // Username Text
-      ctx.fillStyle = themeColor;
+      // Ribbon Username
+      ctx.fillStyle = inkColor;
       ctx.font = 'bold 13px -apple-system, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      const cleanName = job.username.length > 14 ? job.username.substring(0, 13) + '…' : job.username;
-      ctx.fillText(`@${cleanName}`, x, y + 109);
+      const cleanName = job.username.length > 13 ? job.username.substring(0, 12) + '…' : job.username;
+      ctx.fillText(`@${cleanName}`, cx, cy + 112);
 
-      ctx.restore();
       ctx.restore();
     }
 
-    // --- MECHANICAL CNC TOOLHEAD & SUSPENSION ARM ---
-    function drawMechanicalToolhead(lane) {
+    // --- TOP GANTRY & MOTOR TIMING BELT ---
+    function drawTopGantryStructure() {
+      ctx.save();
+
+      // Aluminum V-Slot Extrusion Crossbeam
+      const beamGrad = ctx.createLinearGradient(0, 75, 0, 105);
+      beamGrad.addColorStop(0, '#64748b');
+      beamGrad.addColorStop(0.3, '#94a3b8');
+      beamGrad.addColorStop(0.7, '#475569');
+      beamGrad.addColorStop(1, '#1e293b');
+      ctx.fillStyle = beamGrad;
+      ctx.fillRect(0, 75, WIDTH, 30);
+
+      // Grooved Timing Belt
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 88, WIDTH, 4);
+
+      ctx.restore();
+    }
+
+    // --- 3D MECHANICAL TOOLHEAD (THE PRINTER ARM) ---
+    function draw3DExtruderHead(lane) {
       const hx = lane.toolhead.x;
       const hy = lane.toolhead.y;
+      const lift = lane.toolhead.liftZ;
 
       ctx.save();
 
-      // 1. Dual Vertical Linear Guide Shafts (Extending from top gantry down to head)
-      ctx.strokeStyle = '#94a3b8';
-      ctx.lineWidth = 4;
+      // 1. DYNAMIC DROP SHADOW (Projected on paper, moves with head height)
+      ctx.save();
+      ctx.shadowBlur = lift > 2 ? 26 : 14;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+      ctx.shadowOffsetX = 12 + lift * 0.8;
+      ctx.shadowOffsetY = 14 + lift * 0.8;
+
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
       ctx.beginPath();
-      ctx.moveTo(hx - 22, 114);
-      ctx.lineTo(hx - 22, hy - 20);
-      ctx.moveTo(hx + 22, 114);
-      ctx.lineTo(hx + 22, hy - 20);
+      ctx.roundRect(hx - 36, hy - 40, 72, 54, 8);
+      ctx.fill();
+      ctx.restore();
+
+      // 2. Dual Polished Chrome Linear Shafts (Connecting top rail to head)
+      const shaftGrad = ctx.createLinearGradient(hx - 22, 0, hx + 22, 0);
+      shaftGrad.addColorStop(0, '#64748b');
+      shaftGrad.addColorStop(0.5, '#f8fafc');
+      shaftGrad.addColorStop(1, '#475569');
+
+      ctx.fillStyle = shaftGrad;
+      ctx.fillRect(hx - 24, 105, 6, hy - 145);
+      ctx.fillRect(hx + 18, 105, 6, hy - 145);
+
+      // 3. Flexible Black Cable Harness Loop (Reaching out from top)
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 7;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(hx, 105);
+      ctx.bezierCurveTo(hx - 45, 140, hx - 55, hy - 80, hx - 12, hy - 40);
       ctx.stroke();
 
-      // 2. Extruder / Mechanical Head Carriage Block
-      ctx.shadowBlur = 18;
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-
-      ctx.fillStyle = '#1e293b'; // Gunmetal CNC casing
+      // 4. Stepper Motor Black Housing Block (3D Beveled Box)
+      ctx.fillStyle = '#1e293b';
       ctx.beginPath();
-      ctx.roundRect(hx - 36, hy - 36, 72, 42, 8);
+      ctx.roundRect(hx - 36, hy - 42, 72, 46, 8);
       ctx.fill();
 
-      // Brushed Metal Plate Detail
+      // Silver Motor Plate Lid
       ctx.fillStyle = '#334155';
-      ctx.fillRect(hx - 26, hy - 26, 52, 14);
+      ctx.fillRect(hx - 28, hy - 36, 56, 12);
 
-      // Status LED on Plotter
-      ctx.fillStyle = lane.activeJob ? '#22c55e' : '#64748b';
-      ctx.beginPath();
-      ctx.arc(hx + 22, hy - 26, 3.5, 0, Math.PI * 2);
-      ctx.fill();
+      // 4 Corner Motor Screws
+      ctx.fillStyle = '#94a3b8';
+      const screwPositions = [
+        [-30, -38], [24, -38], [-30, -4], [24, -4]
+      ];
+      for (const [sx, sy] of screwPositions) {
+        ctx.beginPath();
+        ctx.arc(hx + sx + 3, hy + sy + 3, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
-      // 3. Nozzle Needle / Stylus Pen Tip
+      // Cooling Fan Grill Vents
       ctx.fillStyle = '#0f172a';
+      for (let r = 0; r < 3; r++) {
+        ctx.fillRect(hx - 18, hy - 18 + r * 5, 36, 2.5);
+      }
+
+      // 5. Aluminum Heater Block
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillRect(hx - 12, hy + 4, 24, 10);
+
+      // 6. Machined Brass Nozzle Tip
+      const brassGrad = ctx.createLinearGradient(hx - 8, hy + 14, hx + 8, hy + 24);
+      brassGrad.addColorStop(0, '#f59e0b');
+      brassGrad.addColorStop(0.5, '#fef08a');
+      brassGrad.addColorStop(1, '#b45309');
+      ctx.fillStyle = brassGrad;
       ctx.beginPath();
-      ctx.moveTo(hx - 7, hy + 6);
-      ctx.lineTo(hx + 7, hy + 6);
-      ctx.lineTo(hx, hy + 22);
+      ctx.moveTo(hx - 8, hy + 14);
+      ctx.lineTo(hx + 8, hy + 14);
+      ctx.lineTo(hx, hy + 26);
       ctx.closePath();
       ctx.fill();
 
-      // 4. Stylus Active Spark / Ink Glow Tip
-      if (lane.activeJob) {
-        ctx.shadowBlur = 16;
-        ctx.shadowColor = '#38bdf8';
-        ctx.fillStyle = '#60a5fa';
+      // 7. Active Ink Contact / Laser Plasma Glow Point
+      if (lane.toolhead.penDown) {
+        ctx.save();
+        ctx.shadowBlur = 14;
+        ctx.shadowColor = '#2563eb';
+        ctx.fillStyle = '#38bdf8';
         ctx.beginPath();
-        ctx.arc(hx, hy + 22, 3, 0, Math.PI * 2);
+        ctx.arc(hx, hy + 26, 3, 0, Math.PI * 2);
         ctx.fill();
+        ctx.restore();
       }
 
       ctx.restore();
     }
 
-    // --- PRINTING QUEUE & ROUTING ---
+    // --- JOB MANAGEMENT ---
     function routeIncomingGift(username, avatarUrl, coins) {
       let tier = 'silver';
       if (coins >= 100) tier = 'royal';
@@ -454,10 +679,9 @@
         job.img.src = avatarUrl;
       }
 
-      // Pick lane with shortest combined queue & workload
+      // Route to lane with shortest work backlog
       let bestLane = lanes[0];
       let minLoad = Infinity;
-
       for (const l of lanes) {
         const load = l.queue.length + (l.activeJob ? 1 : 0);
         if (load < minLoad) {
@@ -471,24 +695,24 @@
 
     function startPrintingJob(lane, job) {
       lane.activeJob = job;
-      lane.printProgress = 0;
+      lane.toolpath = buildPlotterToolpath(lane.centerX, PRINT_Y);
+      lane.pathIndex = 0;
     }
 
     function completePrintingJob(lane) {
-      // Transfer to completed scrolling items
       lane.items.unshift({
         ...lane.activeJob,
         y: PRINT_Y - lane.scrollOffset
       });
 
-      // Shift entire conveyor down by 1 full card distance
+      // Shift paper roll down smoothly by 1 full portrait length
       lane.targetScrollOffset += ITEM_HEIGHT;
 
       lane.activeJob = null;
-      lane.printProgress = 0;
+      lane.pathIndex = 0;
 
       totalPrintsCount++;
-      document.getElementById('print-counter').innerText = totalPrintsCount;
+      document.getElementById('total-prints').innerText = totalPrintsCount;
     }
 
     // --- TESTING CONTROLS ---
@@ -512,7 +736,7 @@
       lanes[laneIndex].queue.push({
         username: name,
         avatarUrl: null,
-        tier: Math.random() > 0.5 ? 'gold' : 'silver',
+        tier: Math.random() > 0.5 ? 'gold' : 'royal',
         img: null
       });
     };
